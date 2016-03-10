@@ -1,0 +1,2838 @@
+state 98 contains 13 shift/reduce conflicts
+state 99 contains 13 shift/reduce conflicts
+state 100 contains 13 shift/reduce conflicts
+state 105 contains 2 shift/reduce conflicts
+state 128 contains 1 shift/reduce conflicts
+state 183 contains 1 shift/reduce conflicts
+state 193 contains 1 shift/reduce conflicts
+state 194 contains 1 shift/reduce conflicts
+
+
+-------- Grammar --------
+
+rule 1 plox_generation: 
+rule 2 plox_generation: type_declaration plox_generation
+rule 3 type_declaration: HABEMVS class_declaration SEMIC
+rule 4 class_declaration: SPECIES ID class_declaration2 BLEFT class_declaration3 BRIGHT
+rule 5 class_declaration2: 
+rule 6 class_declaration2: HEIROF ID
+rule 7 class_declaration3: class_declaration4 class_declaration5
+rule 8 class_declaration4: 
+rule 9 class_declaration4: variable_declaration class_declaration4
+rule 10 class_declaration5: 
+rule 11 class_declaration5: method_declaration class_declaration5
+rule 12 modifier: OPEN
+rule 13 modifier: HIDDEN
+rule 14 variable_declaration: variable_declaration2 variable_declaration1 type variable_declaration3 SEMIC
+rule 15 variable_declaration1: 
+rule 16 variable_declaration1: modifier
+rule 17 variable_declaration2: VAR
+rule 18 variable_declaration2: ETERNAL
+rule 19 variable_declaration3: ID variable_declaration4
+rule 20 variable_declaration4: 
+rule 21 variable_declaration4: COMA variable_declaration3
+rule 22 type: type_specifier type1
+rule 23 type1: 
+rule 24 type1: type2
+rule 25 type2: SBLEFT expression SBRIGHT type1
+rule 26 variable_assignment: ID variable_assignment1 assign_operator variable_value
+rule 27 variable_assignment1: 
+rule 28 variable_assignment1: variable_assignment4 variable_assignment5
+rule 29 assign_operator: EQUAL
+rule 30 assign_operator: PLUSASSIGN
+rule 31 assign_operator: MINUSASSIGN
+rule 32 assign_operator: MULTASSIGN
+rule 33 assign_operator: DIVASSIGN
+rule 34 assign_operator: ORASSIGN
+rule 35 assign_operator: ANDASSIGN
+rule 36 assign_operator: MODASSIGN
+rule 37 variable_assignment4: SBLEFT expression SBRIGHT variable_assignment5
+rule 38 variable_assignment5: 
+rule 39 variable_assignment5: variable_assignment4
+rule 40 method_declaration: FUNK method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4
+rule 41 method_declaration1: 
+rule 42 method_declaration1: modifier
+rule 43 method_declaration2: ID
+rule 44 method_declaration2: CHIEF
+rule 45 method_declaration3: 
+rule 46 method_declaration3: parameter_list method_declaration3
+rule 47 method_declaration4: statement_block
+rule 48 method_declaration4: SEMIC
+rule 49 type_specifier: LOGIC
+rule 50 type_specifier: CHAR
+rule 51 type_specifier: NUMBER
+rule 52 type_specifier: DECIMAL
+rule 53 type_specifier: ID
+rule 54 type_specifier: OBLIVION
+rule 55 type_specifier: STRING
+rule 56 num_operator: MULT
+rule 57 num_operator: DIV
+rule 58 num_operator: MOD
+rule 59 num_operator: PLUS
+rule 60 num_operator: MINUS
+rule 61 variable_value: expression SEMIC
+rule 62 variable_value: HEAR PLEFT PRIGHT SEMIC
+rule 63 parameter_list: parameter parameter_list1
+rule 64 parameter_list1: 
+rule 65 parameter_list1: COMA parameter_list
+rule 66 statement_block: BLEFT statement_block1 statement_block2 BRIGHT
+rule 67 statement_block1: 
+rule 68 statement_block1: variable_declaration statement_block1
+rule 69 statement_block2: 
+rule 70 statement_block2: statement statement_block2
+rule 71 reference_expression: NULL
+rule 72 reference_expression: ITSELF
+rule 73 reference_expression: ID
+rule 74 reference_expression: reference_expression2
+rule 75 reference_expression2: reference_expression reference_expression5
+rule 76 reference_expression5: PLEFT reference_expression6 PRIGHT
+rule 77 reference_expression5: SBLEFT expression SBRIGHT
+rule 78 reference_expression5: POINT reference_expression
+rule 79 reference_expression6: 
+rule 80 reference_expression6: arglist
+rule 81 parameter: type ID parameter1
+rule 82 parameter1: 
+rule 83 parameter1: parameter2
+rule 84 parameter2: SBLEFT expression SBRIGHT parameter3
+rule 85 parameter3: 
+rule 86 parameter3: parameter2
+rule 87 statement: variable_assignment
+rule 88 statement: SAY PLEFT expression PRIGHT SEMIC
+rule 89 statement: expression SEMIC
+rule 90 statement: statement_block
+rule 91 statement: unless_statement
+rule 92 statement: if_statement
+rule 93 statement: do_statement
+rule 94 statement: while_statement
+rule 95 statement: REPLY statement1 SEMIC
+rule 96 statement: SEMIC
+rule 97 statement1: 
+rule 98 statement1: expression
+rule 99 expression: expression num_operator expression
+rule 100 expression: expression testing_operator expression
+rule 101 expression: NOT expression
+rule 102 expression: expression boolean_operator expression
+rule 103 expression: TRUE
+rule 104 expression: FALSE
+rule 105 expression: PLEFT expression PRIGHT
+rule 106 expression: literal_expression
+rule 107 expression: reference_expression
+rule 108 arglist: expression arglist1
+rule 109 arglist1: 
+rule 110 arglist1: COMA arglist
+rule 111 unless_statement: UNLESS PLEFT expression PRIGHT statement unless_statement1
+rule 112 unless_statement1: 
+rule 113 unless_statement1: ELSE statement
+rule 114 if_statement: IF PLEFT expression PRIGHT statement if_statement1
+rule 115 if_statement1: 
+rule 116 if_statement1: ELSE statement
+rule 117 do_statement: DO statement WHILE PLEFT expression PRIGHT SEMIC
+rule 118 while_statement: WHILE PLEFT expression PRIGHT statement
+rule 119 testing_operator: MTHAN
+rule 120 testing_operator: LTHAN
+rule 121 testing_operator: MEQUAL
+rule 122 testing_operator: LEQUAL
+rule 123 testing_operator: EQUALITY
+rule 124 testing_operator: DIFFERENT
+rule 125 boolean_operator: AND
+rule 126 boolean_operator: OR
+rule 127 literal_expression: CTED
+rule 128 literal_expression: CTEN
+rule 129 literal_expression: CTESTRING
+
+------- Symbols -------
+
+**Nonterminals, with rules where they appear
+
+  $start (64)
+    on right: 
+    on left : 
+  plox_generation (65)
+    on right: 2
+    on left : 1 2
+  type_declaration (66)
+    on right: 2
+    on left : 3
+  class_declaration (67)
+    on right: 3
+    on left : 4
+  class_declaration2 (68)
+    on right: 4
+    on left : 5 6
+  class_declaration3 (69)
+    on right: 4
+    on left : 7
+  class_declaration4 (70)
+    on right: 7 9
+    on left : 8 9
+  class_declaration5 (71)
+    on right: 7 11
+    on left : 10 11
+  variable_declaration (72)
+    on right: 9 68
+    on left : 14
+  method_declaration (73)
+    on right: 11
+    on left : 40
+  modifier (74)
+    on right: 16 42
+    on left : 12 13
+  variable_declaration2 (75)
+    on right: 14
+    on left : 17 18
+  variable_declaration1 (76)
+    on right: 14
+    on left : 15 16
+  type (77)
+    on right: 14 40 81
+    on left : 22
+  variable_declaration3 (78)
+    on right: 14 21
+    on left : 19
+  variable_declaration4 (79)
+    on right: 19
+    on left : 20 21
+  type_specifier (80)
+    on right: 22
+    on left : 49 50 51 52 53 54 55
+  type1 (81)
+    on right: 22 25
+    on left : 23 24
+  type2 (82)
+    on right: 24
+    on left : 25
+  expression (83)
+    on right: 25 37 61 77 84 88 89 98 99 100 101 102 105 108 111 114 117 118
+    on left : 99 100 101 102 103 104 105 106 107
+  variable_assignment (84)
+    on right: 87
+    on left : 26
+  variable_assignment1 (85)
+    on right: 26
+    on left : 27 28
+  assign_operator (86)
+    on right: 26
+    on left : 29 30 31 32 33 34 35 36
+  variable_value (87)
+    on right: 26
+    on left : 61 62
+  variable_assignment4 (88)
+    on right: 28 39
+    on left : 37
+  variable_assignment5 (89)
+    on right: 28 37
+    on left : 38 39
+  method_declaration1 (90)
+    on right: 40
+    on left : 41 42
+  method_declaration2 (91)
+    on right: 40
+    on left : 43 44
+  method_declaration3 (92)
+    on right: 40 46
+    on left : 45 46
+  method_declaration4 (93)
+    on right: 40
+    on left : 47 48
+  parameter_list (94)
+    on right: 46 65
+    on left : 63
+  statement_block (95)
+    on right: 47 90
+    on left : 66
+  num_operator (96)
+    on right: 99
+    on left : 56 57 58 59 60
+  parameter (97)
+    on right: 63
+    on left : 81
+  parameter_list1 (98)
+    on right: 63
+    on left : 64 65
+  statement_block1 (99)
+    on right: 66 68
+    on left : 67 68
+  statement_block2 (100)
+    on right: 66 70
+    on left : 69 70
+  statement (101)
+    on right: 70 111 113 114 116 117 118
+    on left : 87 88 89 90 91 92 93 94 95 96
+  reference_expression (102)
+    on right: 75 78 107
+    on left : 71 72 73 74
+  reference_expression2 (103)
+    on right: 74
+    on left : 75
+  reference_expression5 (104)
+    on right: 75
+    on left : 76 77 78
+  reference_expression6 (105)
+    on right: 76
+    on left : 79 80
+  arglist (106)
+    on right: 80 110
+    on left : 108
+  parameter1 (107)
+    on right: 81
+    on left : 82 83
+  parameter2 (108)
+    on right: 83 86
+    on left : 84
+  parameter3 (109)
+    on right: 84
+    on left : 85 86
+  unless_statement (110)
+    on right: 91
+    on left : 111
+  if_statement (111)
+    on right: 92
+    on left : 114
+  do_statement (112)
+    on right: 93
+    on left : 117
+  while_statement (113)
+    on right: 94
+    on left : 118
+  statement1 (114)
+    on right: 95
+    on left : 97 98
+  testing_operator (115)
+    on right: 100
+    on left : 119 120 121 122 123 124
+  boolean_operator (116)
+    on right: 102
+    on left : 125 126
+  literal_expression (117)
+    on right: 106
+    on left : 127 128 129
+  arglist1 (118)
+    on right: 108
+    on left : 109 110
+  unless_statement1 (119)
+    on right: 111
+    on left : 112 113
+  if_statement1 (120)
+    on right: 114
+    on left : 115 116
+
+**Terminals, with rules where they appear
+
+  $end (0) 
+  error (1) 
+  POINT (2) 78
+  NOT (3) 101
+  MOD (4) 58
+  MULT (5) 56
+  DIV (6) 57
+  PLUS (7) 59
+  MINUS (8) 60
+  MTHAN (9) 119
+  MEQUAL (10) 121
+  LTHAN (11) 120
+  LEQUAL (12) 122
+  EQUALITY (13) 123
+  DIFFERENT (14) 124
+  AND (15) 125
+  OR (16) 126
+  EQUAL (17) 29
+  PLUSASSIGN (18) 30
+  MINUSASSIGN (19) 31
+  MULTASSIGN (20) 32
+  DIVASSIGN (21) 33
+  ORASSIGN (22) 34
+  ANDASSIGN (23) 35
+  MODASSIGN (24) 36
+  SEMIC (25) 3 14 48 61 62 88 89 95 96 117
+  HABEMVS (26) 3
+  SPECIES (27) 4
+  ID (28) 4 6 19 26 43 53 73 81
+  BLEFT (29) 4 66
+  BRIGHT (30) 4 66
+  HEIROF (31) 6
+  OPEN (32) 12
+  HIDDEN (33) 13
+  VAR (34) 17
+  ETERNAL (35) 18
+  COMA (36) 21 65 110
+  SBLEFT (37) 25 37 77 84
+  SBRIGHT (38) 25 37 77 84
+  FUNK (39) 40
+  PLEFT (40) 40 62 76 88 105 111 114 117 118
+  PRIGHT (41) 40 62 76 88 105 111 114 117 118
+  CHIEF (42) 44
+  LOGIC (43) 49
+  CHAR (44) 50
+  NUMBER (45) 51
+  DECIMAL (46) 52
+  OBLIVION (47) 54
+  STRING (48) 55
+  HEAR (49) 62
+  NULL (50) 71
+  ITSELF (51) 72
+  SAY (52) 88
+  REPLY (53) 95
+  TRUE (54) 103
+  FALSE (55) 104
+  UNLESS (56) 111
+  ELSE (57) 113 116
+  IF (58) 114
+  DO (59) 117
+  WHILE (60) 117 118
+  CTED (61) 127
+  CTEN (62) 128
+  CTESTRING (63) 129
+
+--------- State ---------
+
+state 0
+
+
+  HABEMVS       shift, and go to state 3
+  $default      reduce using rule 1 (plox_generation)
+
+  plox_generation  go to state 1
+  type_declaration  go to state 2
+
+state 1
+
+
+  $end          shift, and go to state 4
+
+
+state 2
+
+   2) plox_generation : type_declaration _ plox_generation
+
+  HABEMVS       shift, and go to state 3
+  $default      reduce using rule 1 (plox_generation)
+
+  type_declaration  go to state 2
+  plox_generation  go to state 5
+
+state 3
+
+   3) type_declaration : HABEMVS _ class_declaration SEMIC
+
+  SPECIES       shift, and go to state 7
+
+  class_declaration  go to state 6
+
+state 4
+
+
+  $end          shift, and go to state 8
+
+
+state 5
+
+   2) plox_generation : type_declaration plox_generation _
+
+  $default      reduce using rule 2 (plox_generation)
+
+
+state 6
+
+   3) type_declaration : HABEMVS class_declaration _ SEMIC
+
+  SEMIC         shift, and go to state 9
+
+
+state 7
+
+   4) class_declaration : SPECIES _ ID class_declaration2 BLEFT class_declaration3 BRIGHT
+
+  ID            shift, and go to state 10
+
+
+state 8
+
+
+  $default      accept
+
+
+state 9
+
+   3) type_declaration : HABEMVS class_declaration SEMIC _
+
+  $default      reduce using rule 3 (type_declaration)
+
+
+state 10
+
+   4) class_declaration : SPECIES ID _ class_declaration2 BLEFT class_declaration3 BRIGHT
+
+  HEIROF        shift, and go to state 12
+  $default      reduce using rule 5 (class_declaration2)
+
+  class_declaration2  go to state 11
+
+state 11
+
+   4) class_declaration : SPECIES ID class_declaration2 _ BLEFT class_declaration3 BRIGHT
+
+  BLEFT         shift, and go to state 13
+
+
+state 12
+
+   6) class_declaration2 : HEIROF _ ID
+
+  ID            shift, and go to state 14
+
+
+state 13
+
+   4) class_declaration : SPECIES ID class_declaration2 BLEFT _ class_declaration3 BRIGHT
+
+  VAR           shift, and go to state 19
+  ETERNAL       shift, and go to state 20
+  $default      reduce using rule 8 (class_declaration4)
+
+  class_declaration3  go to state 15
+  class_declaration4  go to state 16
+  variable_declaration  go to state 17
+  variable_declaration2  go to state 18
+
+state 14
+
+   6) class_declaration2 : HEIROF ID _
+
+  $default      reduce using rule 6 (class_declaration2)
+
+
+state 15
+
+   4) class_declaration : SPECIES ID class_declaration2 BLEFT class_declaration3 _ BRIGHT
+
+  BRIGHT        shift, and go to state 21
+
+
+state 16
+
+   7) class_declaration3 : class_declaration4 _ class_declaration5
+
+  FUNK          shift, and go to state 24
+  $default      reduce using rule 10 (class_declaration5)
+
+  class_declaration5  go to state 22
+  method_declaration  go to state 23
+
+state 17
+
+   9) class_declaration4 : variable_declaration _ class_declaration4
+
+  VAR           shift, and go to state 19
+  ETERNAL       shift, and go to state 20
+  $default      reduce using rule 8 (class_declaration4)
+
+  variable_declaration  go to state 17
+  class_declaration4  go to state 25
+  variable_declaration2  go to state 18
+
+state 18
+
+  14) variable_declaration : variable_declaration2 _ variable_declaration1 type variable_declaration3 SEMIC
+
+  OPEN          shift, and go to state 26
+  HIDDEN        shift, and go to state 27
+  $default      reduce using rule 15 (variable_declaration1)
+
+  variable_declaration1  go to state 28
+  modifier      go to state 29
+
+state 19
+
+  17) variable_declaration2 : VAR _
+
+  $default      reduce using rule 17 (variable_declaration2)
+
+
+state 20
+
+  18) variable_declaration2 : ETERNAL _
+
+  $default      reduce using rule 18 (variable_declaration2)
+
+
+state 21
+
+   4) class_declaration : SPECIES ID class_declaration2 BLEFT class_declaration3 BRIGHT _
+
+  $default      reduce using rule 4 (class_declaration)
+
+
+state 22
+
+   7) class_declaration3 : class_declaration4 class_declaration5 _
+
+  $default      reduce using rule 7 (class_declaration3)
+
+
+state 23
+
+  11) class_declaration5 : method_declaration _ class_declaration5
+
+  FUNK          shift, and go to state 24
+  $default      reduce using rule 10 (class_declaration5)
+
+  method_declaration  go to state 23
+  class_declaration5  go to state 30
+
+state 24
+
+  40) method_declaration : FUNK _ method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4
+
+  OPEN          shift, and go to state 26
+  HIDDEN        shift, and go to state 27
+  $default      reduce using rule 41 (method_declaration1)
+
+  method_declaration1  go to state 31
+  modifier      go to state 32
+
+state 25
+
+   9) class_declaration4 : variable_declaration class_declaration4 _
+
+  $default      reduce using rule 9 (class_declaration4)
+
+
+state 26
+
+  12) modifier : OPEN _
+
+  $default      reduce using rule 12 (modifier)
+
+
+state 27
+
+  13) modifier : HIDDEN _
+
+  $default      reduce using rule 13 (modifier)
+
+
+state 28
+
+  14) variable_declaration : variable_declaration2 variable_declaration1 _ type variable_declaration3 SEMIC
+
+  ID            shift, and go to state 39
+  LOGIC         shift, and go to state 35
+  CHAR          shift, and go to state 36
+  NUMBER        shift, and go to state 37
+  DECIMAL       shift, and go to state 38
+  OBLIVION      shift, and go to state 40
+  STRING        shift, and go to state 41
+
+  type          go to state 33
+  type_specifier  go to state 34
+
+state 29
+
+  16) variable_declaration1 : modifier _
+
+  $default      reduce using rule 16 (variable_declaration1)
+
+
+state 30
+
+  11) class_declaration5 : method_declaration class_declaration5 _
+
+  $default      reduce using rule 11 (class_declaration5)
+
+
+state 31
+
+  40) method_declaration : FUNK method_declaration1 _ type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4
+
+  ID            shift, and go to state 39
+  LOGIC         shift, and go to state 35
+  CHAR          shift, and go to state 36
+  NUMBER        shift, and go to state 37
+  DECIMAL       shift, and go to state 38
+  OBLIVION      shift, and go to state 40
+  STRING        shift, and go to state 41
+
+  type_specifier  go to state 34
+  type          go to state 42
+
+state 32
+
+  42) method_declaration1 : modifier _
+
+  $default      reduce using rule 42 (method_declaration1)
+
+
+state 33
+
+  14) variable_declaration : variable_declaration2 variable_declaration1 type _ variable_declaration3 SEMIC
+
+  ID            shift, and go to state 44
+
+  variable_declaration3  go to state 43
+
+state 34
+
+  22) type : type_specifier _ type1
+
+  SBLEFT        shift, and go to state 47
+  $default      reduce using rule 23 (type1)
+
+  type1         go to state 45
+  type2         go to state 46
+
+state 35
+
+  49) type_specifier : LOGIC _
+
+  $default      reduce using rule 49 (type_specifier)
+
+
+state 36
+
+  50) type_specifier : CHAR _
+
+  $default      reduce using rule 50 (type_specifier)
+
+
+state 37
+
+  51) type_specifier : NUMBER _
+
+  $default      reduce using rule 51 (type_specifier)
+
+
+state 38
+
+  52) type_specifier : DECIMAL _
+
+  $default      reduce using rule 52 (type_specifier)
+
+
+state 39
+
+  53) type_specifier : ID _
+
+  $default      reduce using rule 53 (type_specifier)
+
+
+state 40
+
+  54) type_specifier : OBLIVION _
+
+  $default      reduce using rule 54 (type_specifier)
+
+
+state 41
+
+  55) type_specifier : STRING _
+
+  $default      reduce using rule 55 (type_specifier)
+
+
+state 42
+
+  40) method_declaration : FUNK method_declaration1 type _ method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4
+
+  ID            shift, and go to state 49
+  CHIEF         shift, and go to state 50
+
+  method_declaration2  go to state 48
+
+state 43
+
+  14) variable_declaration : variable_declaration2 variable_declaration1 type variable_declaration3 _ SEMIC
+
+  SEMIC         shift, and go to state 51
+
+
+state 44
+
+  19) variable_declaration3 : ID _ variable_declaration4
+
+  COMA          shift, and go to state 53
+  $default      reduce using rule 20 (variable_declaration4)
+
+  variable_declaration4  go to state 52
+
+state 45
+
+  22) type : type_specifier type1 _
+
+  $default      reduce using rule 22 (type)
+
+
+state 46
+
+  24) type1 : type2 _
+
+  $default      reduce using rule 24 (type1)
+
+
+state 47
+
+  25) type2 : SBLEFT _ expression SBRIGHT type1
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  expression    go to state 54
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  literal_expression  go to state 64
+
+state 48
+
+  40) method_declaration : FUNK method_declaration1 type method_declaration2 _ PLEFT method_declaration3 PRIGHT method_declaration4
+
+  PLEFT         shift, and go to state 68
+
+
+state 49
+
+  43) method_declaration2 : ID _
+
+  $default      reduce using rule 43 (method_declaration2)
+
+
+state 50
+
+  44) method_declaration2 : CHIEF _
+
+  $default      reduce using rule 44 (method_declaration2)
+
+
+state 51
+
+  14) variable_declaration : variable_declaration2 variable_declaration1 type variable_declaration3 SEMIC _
+
+  $default      reduce using rule 14 (variable_declaration)
+
+
+state 52
+
+  19) variable_declaration3 : ID variable_declaration4 _
+
+  $default      reduce using rule 19 (variable_declaration3)
+
+
+state 53
+
+  21) variable_declaration4 : COMA _ variable_declaration3
+
+  ID            shift, and go to state 44
+
+  variable_declaration3  go to state 69
+
+state 54
+
+  25) type2 : SBLEFT expression _ SBRIGHT type1
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SBRIGHT       shift, and go to state 70
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 55
+
+  71) reference_expression : NULL _
+
+  $default      reduce using rule 71 (reference_expression)
+
+
+state 56
+
+  72) reference_expression : ITSELF _
+
+  $default      reduce using rule 72 (reference_expression)
+
+
+state 57
+
+  73) reference_expression : ID _
+
+  $default      reduce using rule 73 (reference_expression)
+
+
+state 58
+
+  74) reference_expression : reference_expression2 _
+
+  $default      reduce using rule 74 (reference_expression)
+
+
+state 59
+
+  75) reference_expression2 : reference_expression _ reference_expression5
+ 107) expression : reference_expression _
+
+  POINT         shift, and go to state 90
+  SBLEFT        shift, and go to state 89
+  PLEFT         shift, and go to state 88
+  $default      reduce using rule 107 (expression)
+
+  reference_expression5  go to state 87
+
+state 60
+
+ 101) expression : NOT _ expression
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 91
+  literal_expression  go to state 64
+
+state 61
+
+ 103) expression : TRUE _
+
+  $default      reduce using rule 103 (expression)
+
+
+state 62
+
+ 104) expression : FALSE _
+
+  $default      reduce using rule 104 (expression)
+
+
+state 63
+
+ 105) expression : PLEFT _ expression PRIGHT
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 92
+  literal_expression  go to state 64
+
+state 64
+
+ 106) expression : literal_expression _
+
+  $default      reduce using rule 106 (expression)
+
+
+state 65
+
+ 127) literal_expression : CTED _
+
+  $default      reduce using rule 127 (literal_expression)
+
+
+state 66
+
+ 128) literal_expression : CTEN _
+
+  $default      reduce using rule 128 (literal_expression)
+
+
+state 67
+
+ 129) literal_expression : CTESTRING _
+
+  $default      reduce using rule 129 (literal_expression)
+
+
+state 68
+
+  40) method_declaration : FUNK method_declaration1 type method_declaration2 PLEFT _ method_declaration3 PRIGHT method_declaration4
+
+  ID            shift, and go to state 39
+  LOGIC         shift, and go to state 35
+  CHAR          shift, and go to state 36
+  NUMBER        shift, and go to state 37
+  DECIMAL       shift, and go to state 38
+  OBLIVION      shift, and go to state 40
+  STRING        shift, and go to state 41
+  $default      reduce using rule 45 (method_declaration3)
+
+  type_specifier  go to state 34
+  method_declaration3  go to state 93
+  parameter_list  go to state 94
+  parameter     go to state 95
+  type          go to state 96
+
+state 69
+
+  21) variable_declaration4 : COMA variable_declaration3 _
+
+  $default      reduce using rule 21 (variable_declaration4)
+
+
+state 70
+
+  25) type2 : SBLEFT expression SBRIGHT _ type1
+
+  SBLEFT        shift, and go to state 47
+  $default      reduce using rule 23 (type1)
+
+  type2         go to state 46
+  type1         go to state 97
+
+state 71
+
+  56) num_operator : MULT _
+
+  $default      reduce using rule 56 (num_operator)
+
+
+state 72
+
+  57) num_operator : DIV _
+
+  $default      reduce using rule 57 (num_operator)
+
+
+state 73
+
+  58) num_operator : MOD _
+
+  $default      reduce using rule 58 (num_operator)
+
+
+state 74
+
+  59) num_operator : PLUS _
+
+  $default      reduce using rule 59 (num_operator)
+
+
+state 75
+
+  60) num_operator : MINUS _
+
+  $default      reduce using rule 60 (num_operator)
+
+
+state 76
+
+  99) expression : expression num_operator _ expression
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 98
+  literal_expression  go to state 64
+
+state 77
+
+ 100) expression : expression testing_operator _ expression
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 99
+  literal_expression  go to state 64
+
+state 78
+
+ 102) expression : expression boolean_operator _ expression
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 100
+  literal_expression  go to state 64
+
+state 79
+
+ 119) testing_operator : MTHAN _
+
+  $default      reduce using rule 119 (testing_operator)
+
+
+state 80
+
+ 120) testing_operator : LTHAN _
+
+  $default      reduce using rule 120 (testing_operator)
+
+
+state 81
+
+ 121) testing_operator : MEQUAL _
+
+  $default      reduce using rule 121 (testing_operator)
+
+
+state 82
+
+ 122) testing_operator : LEQUAL _
+
+  $default      reduce using rule 122 (testing_operator)
+
+
+state 83
+
+ 123) testing_operator : EQUALITY _
+
+  $default      reduce using rule 123 (testing_operator)
+
+
+state 84
+
+ 124) testing_operator : DIFFERENT _
+
+  $default      reduce using rule 124 (testing_operator)
+
+
+state 85
+
+ 125) boolean_operator : AND _
+
+  $default      reduce using rule 125 (boolean_operator)
+
+
+state 86
+
+ 126) boolean_operator : OR _
+
+  $default      reduce using rule 126 (boolean_operator)
+
+
+state 87
+
+  75) reference_expression2 : reference_expression reference_expression5 _
+
+  $default      reduce using rule 75 (reference_expression2)
+
+
+state 88
+
+  76) reference_expression5 : PLEFT _ reference_expression6 PRIGHT
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+  $default      reduce using rule 79 (reference_expression6)
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  reference_expression6  go to state 101
+  arglist       go to state 102
+  expression    go to state 103
+  literal_expression  go to state 64
+
+state 89
+
+  77) reference_expression5 : SBLEFT _ expression SBRIGHT
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 104
+  literal_expression  go to state 64
+
+state 90
+
+  78) reference_expression5 : POINT _ reference_expression
+
+  ID            shift, and go to state 57
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 105
+
+state 91
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 101) expression : NOT expression _
+ 102) expression : expression _ boolean_operator expression
+
+  $default      reduce using rule 101 (expression)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 92
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 105) expression : PLEFT expression _ PRIGHT
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 106
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 93
+
+  40) method_declaration : FUNK method_declaration1 type method_declaration2 PLEFT method_declaration3 _ PRIGHT method_declaration4
+
+  PRIGHT        shift, and go to state 107
+
+
+state 94
+
+  46) method_declaration3 : parameter_list _ method_declaration3
+
+  ID            shift, and go to state 39
+  LOGIC         shift, and go to state 35
+  CHAR          shift, and go to state 36
+  NUMBER        shift, and go to state 37
+  DECIMAL       shift, and go to state 38
+  OBLIVION      shift, and go to state 40
+  STRING        shift, and go to state 41
+  $default      reduce using rule 45 (method_declaration3)
+
+  type_specifier  go to state 34
+  parameter_list  go to state 94
+  method_declaration3  go to state 108
+  parameter     go to state 95
+  type          go to state 96
+
+state 95
+
+  63) parameter_list : parameter _ parameter_list1
+
+  COMA          shift, and go to state 110
+  $default      reduce using rule 64 (parameter_list1)
+
+  parameter_list1  go to state 109
+
+state 96
+
+  81) parameter : type _ ID parameter1
+
+  ID            shift, and go to state 111
+
+
+state 97
+
+  25) type2 : SBLEFT expression SBRIGHT type1 _
+
+  $default      reduce using rule 25 (type2)
+
+
+state 98
+
+  99) expression : expression _ num_operator expression
+  99) expression : expression num_operator expression _
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MOD           [reduce using rule 99 (expression)]
+  MULT          shift, and go to state 71
+  MULT          [reduce using rule 99 (expression)]
+  DIV           shift, and go to state 72
+  DIV           [reduce using rule 99 (expression)]
+  PLUS          shift, and go to state 74
+  PLUS          [reduce using rule 99 (expression)]
+  MINUS         shift, and go to state 75
+  MINUS         [reduce using rule 99 (expression)]
+  MTHAN         shift, and go to state 79
+  MTHAN         [reduce using rule 99 (expression)]
+  MEQUAL        shift, and go to state 81
+  MEQUAL        [reduce using rule 99 (expression)]
+  LTHAN         shift, and go to state 80
+  LTHAN         [reduce using rule 99 (expression)]
+  LEQUAL        shift, and go to state 82
+  LEQUAL        [reduce using rule 99 (expression)]
+  EQUALITY      shift, and go to state 83
+  EQUALITY      [reduce using rule 99 (expression)]
+  DIFFERENT     shift, and go to state 84
+  DIFFERENT     [reduce using rule 99 (expression)]
+  AND           shift, and go to state 85
+  AND           [reduce using rule 99 (expression)]
+  OR            shift, and go to state 86
+  OR            [reduce using rule 99 (expression)]
+  $default      reduce using rule 99 (expression)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 99
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 100) expression : expression testing_operator expression _
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MOD           [reduce using rule 100 (expression)]
+  MULT          shift, and go to state 71
+  MULT          [reduce using rule 100 (expression)]
+  DIV           shift, and go to state 72
+  DIV           [reduce using rule 100 (expression)]
+  PLUS          shift, and go to state 74
+  PLUS          [reduce using rule 100 (expression)]
+  MINUS         shift, and go to state 75
+  MINUS         [reduce using rule 100 (expression)]
+  MTHAN         shift, and go to state 79
+  MTHAN         [reduce using rule 100 (expression)]
+  MEQUAL        shift, and go to state 81
+  MEQUAL        [reduce using rule 100 (expression)]
+  LTHAN         shift, and go to state 80
+  LTHAN         [reduce using rule 100 (expression)]
+  LEQUAL        shift, and go to state 82
+  LEQUAL        [reduce using rule 100 (expression)]
+  EQUALITY      shift, and go to state 83
+  EQUALITY      [reduce using rule 100 (expression)]
+  DIFFERENT     shift, and go to state 84
+  DIFFERENT     [reduce using rule 100 (expression)]
+  AND           shift, and go to state 85
+  AND           [reduce using rule 100 (expression)]
+  OR            shift, and go to state 86
+  OR            [reduce using rule 100 (expression)]
+  $default      reduce using rule 100 (expression)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 100
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 102) expression : expression boolean_operator expression _
+
+  MOD           shift, and go to state 73
+  MOD           [reduce using rule 102 (expression)]
+  MULT          shift, and go to state 71
+  MULT          [reduce using rule 102 (expression)]
+  DIV           shift, and go to state 72
+  DIV           [reduce using rule 102 (expression)]
+  PLUS          shift, and go to state 74
+  PLUS          [reduce using rule 102 (expression)]
+  MINUS         shift, and go to state 75
+  MINUS         [reduce using rule 102 (expression)]
+  MTHAN         shift, and go to state 79
+  MTHAN         [reduce using rule 102 (expression)]
+  MEQUAL        shift, and go to state 81
+  MEQUAL        [reduce using rule 102 (expression)]
+  LTHAN         shift, and go to state 80
+  LTHAN         [reduce using rule 102 (expression)]
+  LEQUAL        shift, and go to state 82
+  LEQUAL        [reduce using rule 102 (expression)]
+  EQUALITY      shift, and go to state 83
+  EQUALITY      [reduce using rule 102 (expression)]
+  DIFFERENT     shift, and go to state 84
+  DIFFERENT     [reduce using rule 102 (expression)]
+  AND           shift, and go to state 85
+  AND           [reduce using rule 102 (expression)]
+  OR            shift, and go to state 86
+  OR            [reduce using rule 102 (expression)]
+  $default      reduce using rule 102 (expression)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 101
+
+  76) reference_expression5 : PLEFT reference_expression6 _ PRIGHT
+
+  PRIGHT        shift, and go to state 112
+
+
+state 102
+
+  80) reference_expression6 : arglist _
+
+  $default      reduce using rule 80 (reference_expression6)
+
+
+state 103
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 108) arglist : expression _ arglist1
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  COMA          shift, and go to state 114
+  $default      reduce using rule 109 (arglist1)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+  arglist1      go to state 113
+
+state 104
+
+  77) reference_expression5 : SBLEFT expression _ SBRIGHT
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SBRIGHT       shift, and go to state 115
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 105
+
+  75) reference_expression2 : reference_expression _ reference_expression5
+  78) reference_expression5 : POINT reference_expression _
+
+  POINT         shift, and go to state 90
+  SBLEFT        shift, and go to state 89
+  SBLEFT        [reduce using rule 78 (reference_expression5)]
+  PLEFT         shift, and go to state 88
+  PLEFT         [reduce using rule 78 (reference_expression5)]
+  $default      reduce using rule 78 (reference_expression5)
+
+  reference_expression5  go to state 87
+
+state 106
+
+ 105) expression : PLEFT expression PRIGHT _
+
+  $default      reduce using rule 105 (expression)
+
+
+state 107
+
+  40) method_declaration : FUNK method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT _ method_declaration4
+
+  SEMIC         shift, and go to state 118
+  BLEFT         shift, and go to state 119
+
+  method_declaration4  go to state 116
+  statement_block  go to state 117
+
+state 108
+
+  46) method_declaration3 : parameter_list method_declaration3 _
+
+  $default      reduce using rule 46 (method_declaration3)
+
+
+state 109
+
+  63) parameter_list : parameter parameter_list1 _
+
+  $default      reduce using rule 63 (parameter_list)
+
+
+state 110
+
+  65) parameter_list1 : COMA _ parameter_list
+
+  ID            shift, and go to state 39
+  LOGIC         shift, and go to state 35
+  CHAR          shift, and go to state 36
+  NUMBER        shift, and go to state 37
+  DECIMAL       shift, and go to state 38
+  OBLIVION      shift, and go to state 40
+  STRING        shift, and go to state 41
+
+  type_specifier  go to state 34
+  parameter     go to state 95
+  parameter_list  go to state 120
+  type          go to state 96
+
+state 111
+
+  81) parameter : type ID _ parameter1
+
+  SBLEFT        shift, and go to state 123
+  $default      reduce using rule 82 (parameter1)
+
+  parameter1    go to state 121
+  parameter2    go to state 122
+
+state 112
+
+  76) reference_expression5 : PLEFT reference_expression6 PRIGHT _
+
+  $default      reduce using rule 76 (reference_expression5)
+
+
+state 113
+
+ 108) arglist : expression arglist1 _
+
+  $default      reduce using rule 108 (arglist)
+
+
+state 114
+
+ 110) arglist1 : COMA _ arglist
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 103
+  literal_expression  go to state 64
+  arglist       go to state 124
+
+state 115
+
+  77) reference_expression5 : SBLEFT expression SBRIGHT _
+
+  $default      reduce using rule 77 (reference_expression5)
+
+
+state 116
+
+  40) method_declaration : FUNK method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4 _
+
+  $default      reduce using rule 40 (method_declaration)
+
+
+state 117
+
+  47) method_declaration4 : statement_block _
+
+  $default      reduce using rule 47 (method_declaration4)
+
+
+state 118
+
+  48) method_declaration4 : SEMIC _
+
+  $default      reduce using rule 48 (method_declaration4)
+
+
+state 119
+
+  66) statement_block : BLEFT _ statement_block1 statement_block2 BRIGHT
+
+  VAR           shift, and go to state 19
+  ETERNAL       shift, and go to state 20
+  $default      reduce using rule 67 (statement_block1)
+
+  variable_declaration2  go to state 18
+  statement_block1  go to state 125
+  variable_declaration  go to state 126
+
+state 120
+
+  65) parameter_list1 : COMA parameter_list _
+
+  $default      reduce using rule 65 (parameter_list1)
+
+
+state 121
+
+  81) parameter : type ID parameter1 _
+
+  $default      reduce using rule 81 (parameter)
+
+
+state 122
+
+  83) parameter1 : parameter2 _
+
+  $default      reduce using rule 83 (parameter1)
+
+
+state 123
+
+  84) parameter2 : SBLEFT _ expression SBRIGHT parameter3
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 127
+  literal_expression  go to state 64
+
+state 124
+
+ 110) arglist1 : COMA arglist _
+
+  $default      reduce using rule 110 (arglist1)
+
+
+state 125
+
+  66) statement_block : BLEFT statement_block1 _ statement_block2 BRIGHT
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+  $default      reduce using rule 69 (statement_block2)
+
+  statement_block2  go to state 129
+  statement     go to state 130
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+
+state 126
+
+  68) statement_block1 : variable_declaration _ statement_block1
+
+  VAR           shift, and go to state 19
+  ETERNAL       shift, and go to state 20
+  $default      reduce using rule 67 (statement_block1)
+
+  variable_declaration2  go to state 18
+  variable_declaration  go to state 126
+  statement_block1  go to state 145
+
+state 127
+
+  84) parameter2 : SBLEFT expression _ SBRIGHT parameter3
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SBRIGHT       shift, and go to state 146
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 128
+
+  26) variable_assignment : ID _ variable_assignment1 assign_operator variable_value
+  73) reference_expression : ID _
+
+  SBLEFT        shift, and go to state 149
+  SBLEFT        [reduce using rule 73 (reference_expression)]
+  EQUAL         reduce using rule 27 (variable_assignment1)
+  PLUSASSIGN    reduce using rule 27 (variable_assignment1)
+  MINUSASSIGN   reduce using rule 27 (variable_assignment1)
+  MULTASSIGN    reduce using rule 27 (variable_assignment1)
+  DIVASSIGN     reduce using rule 27 (variable_assignment1)
+  ORASSIGN      reduce using rule 27 (variable_assignment1)
+  ANDASSIGN     reduce using rule 27 (variable_assignment1)
+  MODASSIGN     reduce using rule 27 (variable_assignment1)
+  $default      reduce using rule 73 (reference_expression)
+
+  variable_assignment1  go to state 147
+  variable_assignment4  go to state 148
+
+state 129
+
+  66) statement_block : BLEFT statement_block1 statement_block2 _ BRIGHT
+
+  BRIGHT        shift, and go to state 150
+
+
+state 130
+
+  70) statement_block2 : statement _ statement_block2
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+  $default      reduce using rule 69 (statement_block2)
+
+  statement     go to state 130
+  statement_block2  go to state 151
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+
+state 131
+
+  87) statement : variable_assignment _
+
+  $default      reduce using rule 87 (statement)
+
+
+state 132
+
+  88) statement : SAY _ PLEFT expression PRIGHT SEMIC
+
+  PLEFT         shift, and go to state 152
+
+
+state 133
+
+  89) statement : expression _ SEMIC
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SEMIC         shift, and go to state 153
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 134
+
+  90) statement : statement_block _
+
+  $default      reduce using rule 90 (statement)
+
+
+state 135
+
+  91) statement : unless_statement _
+
+  $default      reduce using rule 91 (statement)
+
+
+state 136
+
+  92) statement : if_statement _
+
+  $default      reduce using rule 92 (statement)
+
+
+state 137
+
+  93) statement : do_statement _
+
+  $default      reduce using rule 93 (statement)
+
+
+state 138
+
+  94) statement : while_statement _
+
+  $default      reduce using rule 94 (statement)
+
+
+state 139
+
+  95) statement : REPLY _ statement1 SEMIC
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+  $default      reduce using rule 97 (statement1)
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  statement1    go to state 154
+  expression    go to state 155
+  literal_expression  go to state 64
+
+state 140
+
+  96) statement : SEMIC _
+
+  $default      reduce using rule 96 (statement)
+
+
+state 141
+
+ 111) unless_statement : UNLESS _ PLEFT expression PRIGHT statement unless_statement1
+
+  PLEFT         shift, and go to state 156
+
+
+state 142
+
+ 114) if_statement : IF _ PLEFT expression PRIGHT statement if_statement1
+
+  PLEFT         shift, and go to state 157
+
+
+state 143
+
+ 117) do_statement : DO _ statement WHILE PLEFT expression PRIGHT SEMIC
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 158
+
+state 144
+
+ 118) while_statement : WHILE _ PLEFT expression PRIGHT statement
+
+  PLEFT         shift, and go to state 159
+
+
+state 145
+
+  68) statement_block1 : variable_declaration statement_block1 _
+
+  $default      reduce using rule 68 (statement_block1)
+
+
+state 146
+
+  84) parameter2 : SBLEFT expression SBRIGHT _ parameter3
+
+  SBLEFT        shift, and go to state 123
+  $default      reduce using rule 85 (parameter3)
+
+  parameter3    go to state 160
+  parameter2    go to state 161
+
+state 147
+
+  26) variable_assignment : ID variable_assignment1 _ assign_operator variable_value
+
+  EQUAL         shift, and go to state 163
+  PLUSASSIGN    shift, and go to state 164
+  MINUSASSIGN   shift, and go to state 165
+  MULTASSIGN    shift, and go to state 166
+  DIVASSIGN     shift, and go to state 167
+  ORASSIGN      shift, and go to state 168
+  ANDASSIGN     shift, and go to state 169
+  MODASSIGN     shift, and go to state 170
+
+  assign_operator  go to state 162
+
+state 148
+
+  28) variable_assignment1 : variable_assignment4 _ variable_assignment5
+
+  SBLEFT        shift, and go to state 149
+  $default      reduce using rule 38 (variable_assignment5)
+
+  variable_assignment5  go to state 171
+  variable_assignment4  go to state 172
+
+state 149
+
+  37) variable_assignment4 : SBLEFT _ expression SBRIGHT variable_assignment5
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  expression    go to state 173
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  literal_expression  go to state 64
+
+state 150
+
+  66) statement_block : BLEFT statement_block1 statement_block2 BRIGHT _
+
+  $default      reduce using rule 66 (statement_block)
+
+
+state 151
+
+  70) statement_block2 : statement statement_block2 _
+
+  $default      reduce using rule 70 (statement_block2)
+
+
+state 152
+
+  88) statement : SAY PLEFT _ expression PRIGHT SEMIC
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 174
+  literal_expression  go to state 64
+
+state 153
+
+  89) statement : expression SEMIC _
+
+  $default      reduce using rule 89 (statement)
+
+
+state 154
+
+  95) statement : REPLY statement1 _ SEMIC
+
+  SEMIC         shift, and go to state 175
+
+
+state 155
+
+  98) statement1 : expression _
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  $default      reduce using rule 98 (statement1)
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 156
+
+ 111) unless_statement : UNLESS PLEFT _ expression PRIGHT statement unless_statement1
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 176
+  literal_expression  go to state 64
+
+state 157
+
+ 114) if_statement : IF PLEFT _ expression PRIGHT statement if_statement1
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 177
+  literal_expression  go to state 64
+
+state 158
+
+ 117) do_statement : DO statement _ WHILE PLEFT expression PRIGHT SEMIC
+
+  WHILE         shift, and go to state 178
+
+
+state 159
+
+ 118) while_statement : WHILE PLEFT _ expression PRIGHT statement
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 179
+  literal_expression  go to state 64
+
+state 160
+
+  84) parameter2 : SBLEFT expression SBRIGHT parameter3 _
+
+  $default      reduce using rule 84 (parameter2)
+
+
+state 161
+
+  86) parameter3 : parameter2 _
+
+  $default      reduce using rule 86 (parameter3)
+
+
+state 162
+
+  26) variable_assignment : ID variable_assignment1 assign_operator _ variable_value
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  HEAR          shift, and go to state 182
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  variable_value  go to state 180
+  expression    go to state 181
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  literal_expression  go to state 64
+
+state 163
+
+  29) assign_operator : EQUAL _
+
+  $default      reduce using rule 29 (assign_operator)
+
+
+state 164
+
+  30) assign_operator : PLUSASSIGN _
+
+  $default      reduce using rule 30 (assign_operator)
+
+
+state 165
+
+  31) assign_operator : MINUSASSIGN _
+
+  $default      reduce using rule 31 (assign_operator)
+
+
+state 166
+
+  32) assign_operator : MULTASSIGN _
+
+  $default      reduce using rule 32 (assign_operator)
+
+
+state 167
+
+  33) assign_operator : DIVASSIGN _
+
+  $default      reduce using rule 33 (assign_operator)
+
+
+state 168
+
+  34) assign_operator : ORASSIGN _
+
+  $default      reduce using rule 34 (assign_operator)
+
+
+state 169
+
+  35) assign_operator : ANDASSIGN _
+
+  $default      reduce using rule 35 (assign_operator)
+
+
+state 170
+
+  36) assign_operator : MODASSIGN _
+
+  $default      reduce using rule 36 (assign_operator)
+
+
+state 171
+
+  28) variable_assignment1 : variable_assignment4 variable_assignment5 _
+
+  $default      reduce using rule 28 (variable_assignment1)
+
+
+state 172
+
+  39) variable_assignment5 : variable_assignment4 _
+
+  $default      reduce using rule 39 (variable_assignment5)
+
+
+state 173
+
+  37) variable_assignment4 : SBLEFT expression _ SBRIGHT variable_assignment5
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SBRIGHT       shift, and go to state 183
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 174
+
+  88) statement : SAY PLEFT expression _ PRIGHT SEMIC
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 184
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 175
+
+  95) statement : REPLY statement1 SEMIC _
+
+  $default      reduce using rule 95 (statement)
+
+
+state 176
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 111) unless_statement : UNLESS PLEFT expression _ PRIGHT statement unless_statement1
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 185
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 177
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 114) if_statement : IF PLEFT expression _ PRIGHT statement if_statement1
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 186
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 178
+
+ 117) do_statement : DO statement WHILE _ PLEFT expression PRIGHT SEMIC
+
+  PLEFT         shift, and go to state 187
+
+
+state 179
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 118) while_statement : WHILE PLEFT expression _ PRIGHT statement
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 188
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 180
+
+  26) variable_assignment : ID variable_assignment1 assign_operator variable_value _
+
+  $default      reduce using rule 26 (variable_assignment)
+
+
+state 181
+
+  61) variable_value : expression _ SEMIC
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  SEMIC         shift, and go to state 189
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 182
+
+  62) variable_value : HEAR _ PLEFT PRIGHT SEMIC
+
+  PLEFT         shift, and go to state 190
+
+
+state 183
+
+  37) variable_assignment4 : SBLEFT expression SBRIGHT _ variable_assignment5
+
+  SBLEFT        shift, and go to state 149
+  SBLEFT        [reduce using rule 38 (variable_assignment5)]
+  $default      reduce using rule 38 (variable_assignment5)
+
+  variable_assignment5  go to state 191
+  variable_assignment4  go to state 172
+
+state 184
+
+  88) statement : SAY PLEFT expression PRIGHT _ SEMIC
+
+  SEMIC         shift, and go to state 192
+
+
+state 185
+
+ 111) unless_statement : UNLESS PLEFT expression PRIGHT _ statement unless_statement1
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 193
+
+state 186
+
+ 114) if_statement : IF PLEFT expression PRIGHT _ statement if_statement1
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 194
+
+state 187
+
+ 117) do_statement : DO statement WHILE PLEFT _ expression PRIGHT SEMIC
+
+  NOT           shift, and go to state 60
+  ID            shift, and go to state 57
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  expression    go to state 195
+  literal_expression  go to state 64
+
+state 188
+
+ 118) while_statement : WHILE PLEFT expression PRIGHT _ statement
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 196
+
+state 189
+
+  61) variable_value : expression SEMIC _
+
+  $default      reduce using rule 61 (variable_value)
+
+
+state 190
+
+  62) variable_value : HEAR PLEFT _ PRIGHT SEMIC
+
+  PRIGHT        shift, and go to state 197
+
+
+state 191
+
+  37) variable_assignment4 : SBLEFT expression SBRIGHT variable_assignment5 _
+
+  $default      reduce using rule 37 (variable_assignment4)
+
+
+state 192
+
+  88) statement : SAY PLEFT expression PRIGHT SEMIC _
+
+  $default      reduce using rule 88 (statement)
+
+
+state 193
+
+ 111) unless_statement : UNLESS PLEFT expression PRIGHT statement _ unless_statement1
+
+  ELSE          shift, and go to state 199
+  ELSE          [reduce using rule 112 (unless_statement1)]
+  $default      reduce using rule 112 (unless_statement1)
+
+  unless_statement1  go to state 198
+
+state 194
+
+ 114) if_statement : IF PLEFT expression PRIGHT statement _ if_statement1
+
+  ELSE          shift, and go to state 201
+  ELSE          [reduce using rule 115 (if_statement1)]
+  $default      reduce using rule 115 (if_statement1)
+
+  if_statement1  go to state 200
+
+state 195
+
+  99) expression : expression _ num_operator expression
+ 100) expression : expression _ testing_operator expression
+ 102) expression : expression _ boolean_operator expression
+ 117) do_statement : DO statement WHILE PLEFT expression _ PRIGHT SEMIC
+
+  MOD           shift, and go to state 73
+  MULT          shift, and go to state 71
+  DIV           shift, and go to state 72
+  PLUS          shift, and go to state 74
+  MINUS         shift, and go to state 75
+  MTHAN         shift, and go to state 79
+  MEQUAL        shift, and go to state 81
+  LTHAN         shift, and go to state 80
+  LEQUAL        shift, and go to state 82
+  EQUALITY      shift, and go to state 83
+  DIFFERENT     shift, and go to state 84
+  AND           shift, and go to state 85
+  OR            shift, and go to state 86
+  PRIGHT        shift, and go to state 202
+
+  num_operator  go to state 76
+  testing_operator  go to state 77
+  boolean_operator  go to state 78
+
+state 196
+
+ 118) while_statement : WHILE PLEFT expression PRIGHT statement _
+
+  $default      reduce using rule 118 (while_statement)
+
+
+state 197
+
+  62) variable_value : HEAR PLEFT PRIGHT _ SEMIC
+
+  SEMIC         shift, and go to state 203
+
+
+state 198
+
+ 111) unless_statement : UNLESS PLEFT expression PRIGHT statement unless_statement1 _
+
+  $default      reduce using rule 111 (unless_statement)
+
+
+state 199
+
+ 113) unless_statement1 : ELSE _ statement
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 204
+
+state 200
+
+ 114) if_statement : IF PLEFT expression PRIGHT statement if_statement1 _
+
+  $default      reduce using rule 114 (if_statement)
+
+
+state 201
+
+ 116) if_statement1 : ELSE _ statement
+
+  NOT           shift, and go to state 60
+  SEMIC         shift, and go to state 140
+  ID            shift, and go to state 128
+  BLEFT         shift, and go to state 119
+  PLEFT         shift, and go to state 63
+  NULL          shift, and go to state 55
+  ITSELF        shift, and go to state 56
+  SAY           shift, and go to state 132
+  REPLY         shift, and go to state 139
+  TRUE          shift, and go to state 61
+  FALSE         shift, and go to state 62
+  UNLESS        shift, and go to state 141
+  IF            shift, and go to state 142
+  DO            shift, and go to state 143
+  WHILE         shift, and go to state 144
+  CTED          shift, and go to state 65
+  CTEN          shift, and go to state 66
+  CTESTRING     shift, and go to state 67
+
+  reference_expression2  go to state 58
+  reference_expression  go to state 59
+  variable_assignment  go to state 131
+  expression    go to state 133
+  statement_block  go to state 134
+  unless_statement  go to state 135
+  if_statement  go to state 136
+  do_statement  go to state 137
+  while_statement  go to state 138
+  literal_expression  go to state 64
+  statement     go to state 205
+
+state 202
+
+ 117) do_statement : DO statement WHILE PLEFT expression PRIGHT _ SEMIC
+
+  SEMIC         shift, and go to state 206
+
+
+state 203
+
+  62) variable_value : HEAR PLEFT PRIGHT SEMIC _
+
+  $default      reduce using rule 62 (variable_value)
+
+
+state 204
+
+ 113) unless_statement1 : ELSE statement _
+
+  $default      reduce using rule 113 (unless_statement1)
+
+
+state 205
+
+ 116) if_statement1 : ELSE statement _
+
+  $default      reduce using rule 116 (if_statement1)
+
+
+state 206
+
+ 117) do_statement : DO statement WHILE PLEFT expression PRIGHT SEMIC _
+
+  $default      reduce using rule 117 (do_statement)
+

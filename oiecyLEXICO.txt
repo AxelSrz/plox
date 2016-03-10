@@ -1,0 +1,163 @@
+plox_generation ::=
+ (type_declaration)*
+
+type_declaration  ::=
+ "habemvs" class_declaration ";"
+
+class_declaration  ::=
+ ( modifier )?  "species" identifier
+ (  "heirof" identifier )?
+ "{"  (variable_declaration)* ( field_declaration )*  "}"
+
+field_declaration  ::=
+ method_declaration
+ | constructor_declaration
+ |  ";"
+
+method_declaration  ::=
+ ( modifier )? "funk" type ( identifier | "chief" )
+ "("  ( parameter_list )*  ")"
+ ( statement_block  |  ";"  )
+
+constructor_declaration  ::=
+ ( modifier )* identifier ( "("  ( parameter_list )?  ")" ) | ( ( parameter_list )? )
+statement_block
+
+statement_block  ::=  "{" (variable_declaration)* ( statement )*  "}"
+
+variable_declaration  ::=
+ ( modifier )* ( "var" | "eternal" ) type variable_assignment
+ (  "," variable_assignment  )*  ";"
+
+variable_assignment  ::=
+ identifier  (  "[" numeric_expression "]"  )*  (  "=" variable_value )?
+
+variable_value  ::=
+expression
+ |  (  "{"  ( variable_value
+ (  "," variable_value  )*  (  ","  )?  )?  "}"  )
+ |  ( "hear" "()" ";")
+
+parameter_list  ::=
+parameter  (  "," parameter )*
+
+parameter  ::=
+type identifier  ( "[" numeric_expression "]"  )*
+
+statement  ::=
+variable_assignment
+ |  ( creating_statement)
+ |  ( "say" "(" experession ")" ";")
+ |  ( expression  ";"  )
+ |  ( statement_block )
+ |  ( unless_statement )
+ |  ( if_statement )
+ |  ( do_statement )
+ |  ( while_statement )
+ |  (  "reply"  ( expression )?  ";"  )
+ |  (  ";"  )
+
+ unless_statement ::=
+  "unless"  "(" expression  ")" statement
+  (  "else" statement )?
+
+if_statement ::=
+ "if"  "(" expression  ")" statement
+ (  "else" statement )?
+
+do_statement ::=
+ "do" statement  "while"  "(" expression  ")"  ";"
+
+while_statement ::=
+ "while"  "(" expression  ")" statement
+
+expression  ::=
+ valuable_expression
+ |  reference_expression
+
+valuable_expression ::=
+ numeric_expression
+  | testing_expression
+  | logical_expression
+  | literal_expression
+  |  (  "(" expression  ")"  )
+
+reference_expression ::=
+  "null"
+  |  ("itself" ("." reference_expression)*)
+  | reference_expression
+  |  ( identifier
+  (  (  "("  ( arglist )?  ")"  )
+  |  (  "[" expression  "]"  )
+  |  (  "." reference_expression  )
+  )  )
+
+
+numeric_expression  ::=
+ ( numeric_expression
+ (  "+="
+ |  "-="
+ |  "*"
+ |  "*="
+ |  "/"
+ |  "/="
+ |  "%"
+ |  "%="  )
+expression  )
+ | expression_plus_minus
+ | reference_expression
+
+expression_plus_minus  ::=
+ term ( ("+" | "-") term )?
+
+term  ::=
+ numeric_expression ( ("*" | "/") numeric_expression )?
+
+testing_expression  ::=
+ ( expression
+ (  ">"
+ |  "<"
+ |  ">="
+ |  "<="
+ |  "=="
+ |  "!="  )
+expression  )
+
+logical_expression  ::=
+ (  "!" logical_expression )
+ |  ( logical_expression
+ (  "&"
+ |  "&&="
+ |  "&&"
+ |  "||="
+ |  "||" )
+expression  )
+ |  "true"
+ |  "false"
+ |  reference_expression
+
+creating_statement  ::=
+ "fresh"  (  ( identifier  "("  ( arglist )?  ")"  ) ";" )
+
+literal_expression  ::=
+ integer_literal
+ | float_literal
+ | string
+ | character
+
+arglist  ::=
+expression  (  "," expression  )*
+
+type  ::=
+type_specifier  (  "[" numeric_expression "]"  )*
+
+type_specifier ::=
+ "logic"
+ |  "char"
+ |  "number"
+ |  "decimal"
+ | identifier
+
+modifier ::=
+ "open"
+ |  "hidden"

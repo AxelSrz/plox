@@ -1,0 +1,35 @@
+habemvs species Persona {
+var hidden number nEdad;
+var hidden decimal dEstatura;
+var hidden string iPrimerNombre, iApellido;
+
+funk open number getEdad () {
+ reply itself.nEdad;
+}
+funk open decimal getEstatura () {
+ reply itself.dEstatura;
+}
+funk open string getPrimerNombre () {
+ reply itself.iPrimerNombre;
+}
+funk open string getApellido () {
+ reply itself.iApellido;
+}
+
+funk open oblivion setEdad (number edad) {
+ nEdad = edad;
+}
+
+funk open oblivion setEstatura (decimal estatura) {
+ dEstatura = estatura;
+}
+
+funk open oblivion setPrimerNombre (string nombre) {
+ iPrimerNombre = nombre;
+}
+
+funk open oblivion setApellido (string apellido) {
+ iApellido = apellido;
+}
+
+};
