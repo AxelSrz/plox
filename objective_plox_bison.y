@@ -76,7 +76,7 @@ rule
     | variable_assignment4 variable_assignment5       {}
 
   assign_operator:
-    EQUAL
+    EQUAL                                             {"="}
     | PLUSASSIGN
     | MINUSASSIGN
     | MULTASSIGN
@@ -122,15 +122,15 @@ rule
     | STRING                                          {}
 
   num_operator:
-    MULT                                              {}
-    | DIV                                             {}
-    | MOD                                             {}
-    | PLUS                                            {}
-    | MINUS                                           {}
+    MULT                                              {"*"}
+    | DIV                                             {"/"}
+    | MOD                                             {"%"}
+    | PLUS                                            {"+"}
+    | MINUS                                           {"-"}
 
   variable_value:
-    expression SEMIC                                  {}
-    | HEAR PLEFT PRIGHT SEMIC                         {}
+    expression                                        {}
+    | HEAR PLEFT PRIGHT                               {}
 
   parameter_list:
     parameter parameter_list1                         {}
@@ -183,7 +183,7 @@ rule
     | parameter2                                      {}
 
   statement:
-    variable_assignment                               {}
+    variable_assignment SEMIC                         {}
     | SAY PLEFT expression PRIGHT SEMIC               {}
     | expression SEMIC                                {}
     | statement_block                                 {}
@@ -199,13 +199,13 @@ rule
     | expression
 
   expression:
-    expression num_operator expression {}
+    expression num_operator expression                { puts(val[0]+val[1]+val[2].to_s) }
     | expression testing_operator expression          {}
     | NOT expression                                  {}
     | expression boolean_operator expression          {}
     | TRUE                                            {}
     | FALSE                                           {}
-    | PLEFT expression PRIGHT                         {}
+    | PLEFT expression PRIGHT                         {puts val[1].to_s }
     | literal_expression                              {}
     | reference_expression                            {}
 
@@ -249,8 +249,8 @@ rule
     | OR                                              {}
 
   literal_expression:
-    CTED                                              {}
-    | CTEN                                            {}
+    CTED                                              {val[0] = val[0].to_s}
+    | CTEN                                            {val[0] = val[0].to_s}
     | CTESTRING                                       {}
 
 end

@@ -60,7 +60,7 @@ habemvs species EjemploObjectivePlox {
 
     num1 = 13;
     num2 = 12;
-    num3 = num1 + num2;
+    num3 = num1 + num2 * num1;
     media = (num1 + num2) / 3;
 
     say("Introduce el nombre de la clase");

@@ -38,7 +38,7 @@ rule
                            else return [:ID, text] end }
   [0-9]+\.[0-9]+         { [:CTED, text.to_f] }
   [0-9]+                 { [:CTEN, text.to_i] }
-  ".*"                 { [:CTESTRING, text] }
+  ".*"                   { [:CTESTRING, text] }
   !=                     { [:DIFFERENT, text] }
   \|\|=                  { [:ORASSIGN, text] }
   &&=                    { [:ANDASSIGN, text] }
