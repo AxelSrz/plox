@@ -5,49 +5,54 @@ type_declaration  ::=
  "habemvs" class_declaration ";"
 
 class_declaration  ::=
- ( modifier )?  "species" identifier
+ "species" identifier
  (  "heirof" identifier )?
- "{"  (variable_declaration)* ( field_declaration )*  "}"
+ "{"  (variable_declaration)* ( method_declaration )*  "}"
 
-field_declaration  ::=
- method_declaration
- | constructor_declaration
- |  ";"
+modifier ::=
+ "open"
+ |  "hidden"
+
+variable_declaration  ::=
+ ( "var" | "eternal" ) ( modifier )* type identifier
+ (  "," identifier  )*  ";"
+
+type  ::=
+ type_specifier  (  "[" expression "]"  )*
 
 method_declaration  ::=
- ( modifier )? "funk" type ( identifier | "chief" )
+"funk" ( modifier )? type ( identifier | "chief" )
  "("  ( parameter_list )*  ")"
  ( statement_block  |  ";"  )
 
-constructor_declaration  ::=
- ( modifier )* identifier ( "("  ( parameter_list )?  ")" ) | ( ( parameter_list )? )
-statement_block
-
 statement_block  ::=  "{" (variable_declaration)* ( statement )*  "}"
 
-variable_declaration  ::=
- ( modifier )* ( "var" | "eternal" ) type variable_assignment
- (  "," variable_assignment  )*  ";"
-
 variable_assignment  ::=
- identifier  (  "[" numeric_expression "]"  )*  (  "=" variable_value )?
+ identifier  (  "[" expression "]"  )* assign_operator variable_value
+
+assign_operator ::=
+  "="
+  | "+="
+  | "-="
+  | "*="
+  | "/="
+  | "||="
+  | "&&="
+  | "%="
 
 variable_value  ::=
-expression
- |  (  "{"  ( variable_value
- (  "," variable_value  )*  (  ","  )?  )?  "}"  )
+( expression ";" )
  |  ( "hear" "()" ";")
 
 parameter_list  ::=
-parameter  (  "," parameter )*
+parameter  (  "," parameter_list )*
 
 parameter  ::=
-type identifier  ( "[" numeric_expression "]"  )*
+type identifier  ( "[" expression "]"  )*
 
 statement  ::=
 variable_assignment
- |  ( creating_statement)
- |  ( "say" "(" experession ")" ";")
+ |  ( "say" "(" expression ")" ";")
  |  ( expression  ";"  )
  |  ( statement_block )
  |  ( unless_statement )
@@ -57,7 +62,7 @@ variable_assignment
  |  (  "reply"  ( expression )?  ";"  )
  |  (  ";"  )
 
- unless_statement ::=
+unless_statement ::=
   "unless"  "(" expression  ")" statement
   (  "else" statement )?
 
@@ -72,92 +77,57 @@ while_statement ::=
  "while"  "(" expression  ")" statement
 
 expression  ::=
- valuable_expression
- |  reference_expression
-
-valuable_expression ::=
- numeric_expression
-  | testing_expression
-  | logical_expression
-  | literal_expression
-  |  (  "(" expression  ")"  )
+ ( expression num_operator expression )
+ |  ( expression testing_operator expression )
+ |  ( "!" expression )
+ |  ( expression boolean_operator expression )
+ |  ( "true" )
+ |  ( "false" )
+ |  ( "(" expression ")" )
+ |  ( literal_expression )
+ |  ( reference_expression )
 
 reference_expression ::=
   "null"
-  |  ("itself" ("." reference_expression)*)
-  | reference_expression
-  |  ( identifier
-  (  (  "("  ( arglist )?  ")"  )
-  |  (  "[" expression  "]"  )
-  |  (  "." reference_expression  )
-  )  )
-
-
-numeric_expression  ::=
- ( numeric_expression
- (  "+="
- |  "-="
- |  "*"
- |  "*="
- |  "/"
- |  "/="
- |  "%"
- |  "%="  )
-expression  )
- | expression_plus_minus
- | reference_expression
-
-expression_plus_minus  ::=
- term ( ("+" | "-") term )?
-
-term  ::=
- numeric_expression ( ("*" | "/") numeric_expression )?
-
-testing_expression  ::=
- ( expression
- (  ">"
- |  "<"
- |  ">="
- |  "<="
- |  "=="
- |  "!="  )
-expression  )
-
-logical_expression  ::=
- (  "!" logical_expression )
- |  ( logical_expression
- (  "&"
- |  "&&="
- |  "&&"
- |  "||="
- |  "||" )
-expression  )
- |  "true"
- |  "false"
- |  reference_expression
-
-creating_statement  ::=
- "fresh"  (  ( identifier  "("  ( arglist )?  ")"  ) ";" )
+  |  "itself"
+  |  identifier
+  |  reference_expression ( ( "(" ( arglist )? ")" )
+  |  ( "[" expression "]" )
+  |  ( "." reference_expression )
+  )
 
 literal_expression  ::=
- integer_literal
- | float_literal
- | string
- | character
+ cted
+ | cten
+ | ctestring
 
 arglist  ::=
-expression  (  "," expression  )*
-
-type  ::=
-type_specifier  (  "[" numeric_expression "]"  )*
+expression  (  "," arglist  )*
 
 type_specifier ::=
  "logic"
  |  "char"
  |  "number"
  |  "decimal"
- | identifier
+ |  identifier
+ |  "oblivion"
+ |  "string"
 
-modifier ::=
- "open"
- |  "hidden"
+num_operator ::=
+  "*"
+  | "/"
+  | "%"
+  | "+"
+  | "-"
+
+testing_operator ::=
+  ">"
+  | "<"
+  | ">="
+  | "<="
+  | "=="
+  | "!="
+
+boolean_operator ::=
+  "&&"
+  | "||"
