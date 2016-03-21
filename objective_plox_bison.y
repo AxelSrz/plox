@@ -54,8 +54,8 @@ rule
     | modifier                                        {}
 
   variable_is_modifiable:
-    VAR                                               { $actualModifier = true; $isVariable = true }
-    | ETERNAL                                         { $actualModifier = true; $isVariable = false }
+    VAR                                               { $actualModifier = false; $isVariable = true }
+    | ETERNAL                                         { $actualModifier = false; $isVariable = false }
 
   some_variables:
     code_new_variable next_variable                   {}
