@@ -27,7 +27,6 @@ habemvs species Persona {
   funk open oblivion setApellido (id apellido) {
     iApellido = apellido;
   }
-
 };
 
 habemvs species Estudiante heirof Persona {

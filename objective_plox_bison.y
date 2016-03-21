@@ -11,52 +11,61 @@ class ObjectivePlox
     nonassoc SEMIC
   preclow
 rule
+  supreme_plox:
+    plox_generation                                   { puts "OP! Programa compilado exitosamente." }
+
   plox_generation:
     /* empty */                                       {}
-    | type_declaration plox_generation                { puts "OP! Programa compilado exitosamente." }
+    | type_declaration plox_generation                {}
 
   type_declaration:
     HABEMVS class_declaration SEMIC                   {}
 
   class_declaration:
-    SPECIES ID class_declaration2 BLEFT class_declaration3 BRIGHT      {}
+    SPECIES code_new_class code_heirof BLEFT class_body BRIGHT      {}
 
-  class_declaration2:
+  code_new_class:
+    ID { newSpecies(val[0]) }
+
+  code_heirof:
     /* empty */                                       {}
-    | HEIROF ID                                       {}
+    | HEIROF ID                                       { heirSpecies(val[1]) }
 
-  class_declaration3:
-    class_declaration4 class_declaration5             {}
+  class_body:
+    class_variable_block class_function_block         {}
 
-  class_declaration4:
+  class_variable_block:
     /* empty */                                       {}
-    | variable_declaration class_declaration4         {}
+    | variable_declaration class_variable_block       {}
 
-  class_declaration5:
+  class_function_block:
     /* empty */                                       {}
-    | method_declaration class_declaration5            {}
+    | method_declaration class_function_block         {}
 
   modifier:
-    OPEN                                              {}
-    | HIDDEN                                          {}
+    OPEN                                              { $actualModifier = true }
+    | HIDDEN                                          { $actualModifier = false }
 
   variable_declaration:
-    variable_declaration2 variable_declaration1 type variable_declaration3 SEMIC            {}
+    variable_is_modifiable variable_scope type some_variables SEMIC            {}
 
-  variable_declaration1:
+  variable_scope:
     /* empty */                                       {}
     | modifier                                        {}
 
-  variable_declaration2:
-    VAR                                               {}
-    | ETERNAL                                         {}
+  variable_is_modifiable:
+    VAR                                               { $actualModifier = true; $isVariable = true }
+    | ETERNAL                                         { $actualModifier = true; $isVariable = false }
 
-  variable_declaration3:
-    ID variable_declaration4                          {}
+  some_variables:
+    code_new_variable next_variable                   {}
 
-  variable_declaration4:
+  code_new_variable:
+    ID  { }
+
+  next_variable:
     /* empty */                                       {}
-    | COMA variable_declaration3                      {}
+    | COMA some_variables                      {}
 
   type:
     type_specifier type1                              {}
@@ -76,7 +85,7 @@ rule
     | variable_assignment4 variable_assignment5       {}
 
   assign_operator:
-    EQUAL                                             {"="}
+    EQUAL                                             {}
     | PLUSASSIGN
     | MINUSASSIGN
     | MULTASSIGN
@@ -113,20 +122,20 @@ rule
 
 
   type_specifier:
-    LOGIC                                             {}
-    | CHAR                                            {}
-    | NUMBER                                          {}
-    | DECIMAL                                         {}
-    | ID                                              {}
-    | OBLIVION                                        {}
-    | STRING                                          {}
+    LOGIC                                             { $actualType = "logic" }
+    | CHAR                                            { $actualType = "char" }
+    | NUMBER                                          { $actualType = "number" }
+    | DECIMAL                                         { $actualType = "decimal" }
+    | ID                                              { $actualType = "object" }
+    | OBLIVION                                        { $actualType = "oblivion" }
+    | STRING                                          { $actualType = "string" }
 
   num_operator:
-    MULT                                              {"*"}
-    | DIV                                             {"/"}
-    | MOD                                             {"%"}
-    | PLUS                                            {"+"}
-    | MINUS                                           {"-"}
+    MULT                                              {}
+    | DIV                                             {}
+    | MOD                                             {}
+    | PLUS                                            {}
+    | MINUS                                           {}
 
   variable_value:
     expression                                        {}
@@ -199,13 +208,13 @@ rule
     | expression
 
   expression:
-    expression num_operator expression                { puts(val[0]+val[1]+val[2].to_s) }
+    expression num_operator expression                {}
     | expression testing_operator expression          {}
     | NOT expression                                  {}
     | expression boolean_operator expression          {}
     | TRUE                                            {}
     | FALSE                                           {}
-    | PLEFT expression PRIGHT                         {puts val[1].to_s }
+    | PLEFT expression PRIGHT                         {}
     | literal_expression                              {}
     | reference_expression                            {}
 
@@ -249,8 +258,8 @@ rule
     | OR                                              {}
 
   literal_expression:
-    CTED                                              {val[0] = val[0].to_s}
-    | CTEN                                            {val[0] = val[0].to_s}
+    CTED                                              {}
+    | CTEN                                            {}
     | CTESTRING                                       {}
 
 end
@@ -259,14 +268,55 @@ end
 
   require_relative 'lexer'  # Se agrega el lexer al programa de racc.
   $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
+  $speciesBook = Hash.new{}
+  $actualSpecies
+  $actualModifier
+  $isVariable
+  $actualFunction
+  $actualType
 
 ---- inner
+
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
   # Funcion que lee un archivo como entrada.
   def parse(input)
     scan_file(input)
   end
+
   # para poder desplegar la linea en la que se encuentra el error.
   def on_error(t, val, vstack)
-    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line : %i", val.inspect, token_to_str(t) || '?', $line_number)
+    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val.inspect, token_to_str(t) || '?', $line_number)
+  end
+
+  def newSpecies(species)
+    if $speciesBook[species] == nil
+      $speciesBook[species] = Hash.new
+      $speciesBook[species]["global"] = Hash.new
+      $speciesBook[species]["global"]["methods"] = Hash.new
+      $speciesBook[species]["global"]["variables"] = Hash.new
+      $speciesBook[species] = Hash.new
+      $actualSpecies = species
+      $actualFunction = "global"
+      puts "species #{species} successfully defined"
+    else
+      abort("Semantic error: species '#{species}' is already defined. Error on line: #{$line_number}")
+    end
+  end
+
+  def heirSpecies(father)
+    if $speciesBook[father] != nil
+      $speciesBook[$actualSpecies] = $speciesBook[father].clone
+      puts "successful heiring from #{father}"
+    else
+      abort("Semantic error: '#{father}' father of species '#{$actualSpecies}' is not defined. Error on line: #{$line_number}")
+    end
+  end
+
+  def newVariable(id)
+    if $speciesBook[$actualSpecies][$actualFunction]["variables"][id] == nil
+      $speciesBook[$actualSpecies][$actualFunction]["variables"][id] = Hash.new
+      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["type"] = $actualType
+    else
+      abort("Error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+    end
   end
