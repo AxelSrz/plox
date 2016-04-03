@@ -12,16 +12,14 @@ puts hh["variable"]["otro"]["valor"]
 puts hh["variable"]["otro"]
 puts hh["variable"]["troll"]
 
-def newSpecies(species)
-  if directorioSpecies[species] == nil
-    directorioSpecies[species] = Hash.new
-  else
-    abort("Error, species #{species} is alredy defined")
-  end
-end
+puts "---------------------------------"
 
-def heirSpecies(father)
-  if directorioSpecies[father] != nil
-    directorioSpecies[$actualSpecies] = directorioSpecies[father].clone
-  else
-    abort("Error, '#{father}' father of species #{$actualSpecies} is not defined")
+$speciesBook = Hash.new
+species = "Persona"
+$speciesBook[species] = Hash.new
+$speciesBook[species]["global"] = Hash.new
+$speciesBook[species]["global"]["methods"] = Hash.new
+$speciesBook[species]["global"]["variables"] = Hash.new
+$actualSpecies = species
+$actualFunction = "global"
+puts $speciesBook

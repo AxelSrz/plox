@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente." }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook }
 
   plox_generation:
     /* empty */                                       {}
@@ -61,7 +61,7 @@ rule
     code_new_variable next_variable                   {}
 
   code_new_variable:
-    ID  { }
+    ID  { newVariable(val[0]) }
 
   next_variable:
     /* empty */                                       {}
@@ -267,6 +267,7 @@ end
 ---- header
 
   require_relative 'lexer'  # Se agrega el lexer al programa de racc.
+  require "awesome_print"
   $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
   $speciesBook = Hash.new{}
   $actualSpecies
@@ -294,7 +295,6 @@ end
       $speciesBook[species]["global"] = Hash.new
       $speciesBook[species]["global"]["methods"] = Hash.new
       $speciesBook[species]["global"]["variables"] = Hash.new
-      $speciesBook[species] = Hash.new
       $actualSpecies = species
       $actualFunction = "global"
       puts "species #{species} successfully defined"
@@ -316,6 +316,8 @@ end
     if $speciesBook[$actualSpecies][$actualFunction]["variables"][id] == nil
       $speciesBook[$actualSpecies][$actualFunction]["variables"][id] = Hash.new
       $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["type"] = $actualType
+      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["scope"] = $actualModifier
+      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["modifiable"] = $isVariable
     else
       abort("Error, variable '#{id}' is already defined. Error on line: #{$line_number}")
     end
