@@ -102,15 +102,18 @@ rule
     | variable_assignment4                            {}
 
   method_declaration:
-    FUNK method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4          {}
+    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4          {}
+
+  new_function_code:
+    FUNK { $actualModifier = true }
 
   method_declaration1:
     /* empty */                                       {}
     | modifier                                        {}
 
   method_declaration2:
-    ID                                                {}
-    | CHIEF                                           {}
+    ID                                                { newMethod(val[0]) }
+    | CHIEF                                           { newMethod("chief")}
 
   method_declaration3:
     /* empty */                                       {}
@@ -126,7 +129,7 @@ rule
     | CHAR                                            { $actualType = "char" }
     | NUMBER                                          { $actualType = "number" }
     | DECIMAL                                         { $actualType = "decimal" }
-    | ID                                              { $actualType = "object" }
+    | ID                                              { $actualType = val[0] }
     | OBLIVION                                        { $actualType = "oblivion" }
     | STRING                                          { $actualType = "string" }
 
@@ -178,7 +181,7 @@ rule
     | arglist                                         {}
 
   parameter:
-    type ID parameter1                                {}
+    type ID parameter1                                { newArgument(val[0], val[1]) }
 
   parameter1:
     /* empty */                                       {}
@@ -273,8 +276,9 @@ end
   $actualSpecies
   $actualModifier
   $isVariable
-  $actualFunction
   $actualType
+  $actualMethod
+  $actualScope
 
 ---- inner
 
@@ -292,11 +296,11 @@ end
   def newSpecies(species)
     if $speciesBook[species] == nil
       $speciesBook[species] = Hash.new
-      $speciesBook[species]["global"] = Hash.new
-      $speciesBook[species]["global"]["methods"] = Hash.new
-      $speciesBook[species]["global"]["variables"] = Hash.new
+      $speciesBook[species]["methods"] = Hash.new
+      $speciesBook[species]["variables"] = Hash.new
+      $speciesBook[species]["size"] = 0
       $actualSpecies = species
-      $actualFunction = "global"
+      $actualMethod = "species"
       puts "species #{species} successfully defined"
     else
       abort("Semantic error: species '#{species}' is already defined. Error on line: #{$line_number}")
@@ -305,7 +309,7 @@ end
 
   def heirSpecies(father)
     if $speciesBook[father] != nil
-      $speciesBook[$actualSpecies] = $speciesBook[father].clone
+      $speciesBook[$actualSpecies]["father"] = $speciesBook[father]
       puts "successful heiring from #{father}"
     else
       abort("Semantic error: '#{father}' father of species '#{$actualSpecies}' is not defined. Error on line: #{$line_number}")
@@ -313,12 +317,76 @@ end
   end
 
   def newVariable(id)
-    if $speciesBook[$actualSpecies][$actualFunction]["variables"][id] == nil
-      $speciesBook[$actualSpecies][$actualFunction]["variables"][id] = Hash.new
-      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["type"] = $actualType
-      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["scope"] = $actualModifier
-      $speciesBook[$actualSpecies][$actualFunction]["variables"][id]["modifiable"] = $isVariable
+    if $actualMethod == "species"
+      unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
+        unless isValidType($actualType)
+          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+        end
+        if $actualType == $actualSpecies
+          abort("Semantic error, you cannot have recursive species definitions. Error on line: #{$line_number}")
+        end
+        $speciesBook[$actualSpecies]["variables"][id] = Hash.new
+        $speciesBook[$actualSpecies]["variables"][id]["type"] = $actualType
+        $speciesBook[$actualSpecies]["variables"][id]["scope"] = $actualModifier
+        $speciesBook[$actualSpecies]["variables"][id]["modifiable"] = $isVariable
+      else
+        abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+      end
     else
-      abort("Error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+      if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
+        unless isValidType($actualType)
+          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+        end
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = $actualType
+      else
+        abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+      end
+    end
+  end
+
+  def idDeclaredInSpeciesRecursively(species, id, type)
+    if species[type][id] != nil # regresa si la variable ya existe
+      return true
+    elsif species["father"] == nil  # si la clase no tiene padre
+      return false
+    else
+      return idDeclaredInSpeciesRecursively(species["father"], id, type) # checa para su padre
+    end
+  end
+
+  def isValidType(type)
+    if type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+      return true
+    else
+      return $speciesBook[type] != nil # que no sea un hash vacio (valor por default)
+    end
+  end
+
+  def newMethod(id)
+    unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "methods")
+      unless isValidType($actualType) || $actualType == "oblivion"
+        abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+      end
+      $speciesBook[$actualSpecies]["methods"][id] = Hash.new
+      $speciesBook[$actualSpecies]["methods"][id]["type"] = $actualType
+      $speciesBook[$actualSpecies]["methods"][id]["scope"] = $actualModifier
+      $speciesBook[$actualSpecies]["methods"][id]["size"] = 0
+      $speciesBook[$actualSpecies]["methods"][id]["variables"] = Hash.new
+      $speciesBook[$actualSpecies]["methods"][id]["argumentList"] = []
+      $actualMethod = id
+    else
+      abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+    end
+  end
+
+  def newArgument(type, id)
+    if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
+      unless isValidType(type)
+        abort("Semantic error, species '#{type}' is not defined. Error on line: #{$line_number}")
+      end
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = type
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["argumentList"].push(type)
+    else
+      abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
     end
   end

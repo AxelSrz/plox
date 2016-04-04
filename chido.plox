@@ -1,30 +1,30 @@
 habemvs species Persona {
   var hidden number nEdad;
   var hidden decimal dEstatura;
-  var hidden id iPrimerNombre, iApellido;
+  var hidden string iPrimerNombre, iApellido;
 
-  funk open number getEdad () {
+  funk open number getEdad() {
     reply itself.nEdad;
   }
-  funk open decimal getEstatura () {
+  funk open decimal getEstatura() {
     reply itself.dEstatura;
   }
-  funk open id getPrimerNombre () {
+  funk open string getPrimerNombre() {
     reply itself.iPrimerNombre;
   }
-  funk open id getApellido () {
+  funk open string getApellido() {
     reply itself.iApellido;
   }
-  funk open oblivion setEdad (number edad) {
+  funk open oblivion setEdad(number edad) {
     nEdad = edad;
   }
-  funk open oblivion setEstatura (decimal estatura) {
+  funk open oblivion setEstatura(decimal estatura) {
     dEstatura = estatura;
   }
-  funk open oblivion setPrimerNombre (id nombre) {
+  funk open oblivion setPrimerNombre(string nombre) {
     iPrimerNombre = nombre;
   }
-  funk open oblivion setApellido (id apellido) {
+  funk open oblivion setApellido(string apellido) {
     iApellido = apellido;
   }
 };
@@ -33,29 +33,28 @@ habemvs species Estudiante heirof Persona {
   var hidden number nMatricula;
   var hidden decimal dPromedio;
 
-  funk open number getMatricula () {
+  funk open number getMatricula() {
     reply itself.nMatricula;
   }
-  funk open decimal getPromedio () {
+  funk open decimal getPromedio() {
     reply itself.dPromedio;
   }
-  funk open oblivion setMatricula (number matricula) {
+  funk open oblivion setMatricula(number matricula) {
     nMatricula = matricula;
   }
-  funk open oblivion setPromedio (decimal promedio) {
+  funk open oblivion setPromedio(decimal promedio) {
     dPromedio = promedio;
   }
 };
 
 habemvs species EjemploObjectivePlox {
-
   var Estudiante estEstudiante;
   eternal decimal pi;
 
   funk oblivion chief() {
     var number num1, num2;
     var decimal num3, media;
-    var id clase;
+    var string clase;
 
     num1 = 13;
     num2 = 12;

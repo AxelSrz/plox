@@ -71,7 +71,6 @@ class ObjectivePlox < Racc::Parser
                            elsif text == "open" then return [:OPEN, text]
                            elsif text == "hidden" then return [:HIDDEN, text]
                            elsif text == "species" then return [:SPECIES, text]
-                           elsif text == "fresh" then return [:FRESH, text]
                            elsif text == "null" then return [:NULL, text]
                            elsif text == "if" then return [:IF, text]
                            elsif text == "else" then return [:ELSE, text]
