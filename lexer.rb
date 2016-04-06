@@ -64,141 +64,141 @@ class ObjectivePlox < Racc::Parser
 
       when (text = @ss.scan(/[a-zA-Z][a-zA-Z0-9]*/))
          action { $line_number = lineno; if text == "habemvs" then return [:HABEMVS, text]
-                           elsif text == "oblivion" then return [:OBLIVION, text]
-                           elsif text == "var" then return [:VAR, text]
-                           elsif text == "eternal" then return [:ETERNAL, text]
-                           elsif text == "chief" then return [:CHIEF, text]
-                           elsif text == "open" then return [:OPEN, text]
-                           elsif text == "hidden" then return [:HIDDEN, text]
-                           elsif text == "species" then return [:SPECIES, text]
-                           elsif text == "null" then return [:NULL, text]
-                           elsif text == "if" then return [:IF, text]
-                           elsif text == "else" then return [:ELSE, text]
-                           elsif text == "while" then return [:WHILE, text]
-                           elsif text == "do" then return [:DO, text]
-                           elsif text == "unless" then return [:UNLESS, text]
-                           elsif text == "true" then return [:TRUE, text]
-                           elsif text == "false" then return [:FALSE, text]
-                           elsif text == "var" then return [:VAR, text]
-                           elsif text == "say" then return [:SAY, text]
-                           elsif text == "hear" then return [:HEAR, text]
-                           elsif text == "itself" then return [:ITSELF, text]
-                           elsif text == "funk" then return [:FUNK, text]
-                           elsif text == "eternal" then return [:ETERNAL, text]
-                           elsif text == "heirof" then return [:HEIROF, text]
-                           elsif text == "reply" then return [:REPLY, text]
-                           elsif text == "number" then return [:NUMBER, text]
-                           elsif text == "decimal" then return [:DECIMAL, text]
-                           elsif text == "char" then return [:CHAR, text]
-                           elsif text == "string" then return [:STRING, text]
-                           elsif text == "logic" then return [:LOGIC, text]
-                           else return [:ID, text] end }
+                           elsif text == "oblivion" then return [:OBLIVION, {0 => text}]
+                           elsif text == "var" then return [:VAR, {0 => text}]
+                           elsif text == "eternal" then return [:ETERNAL, {0 => text}]
+                           elsif text == "chief" then return [:CHIEF, {0 => text}]
+                           elsif text == "open" then return [:OPEN, {0 => text}]
+                           elsif text == "hidden" then return [:HIDDEN, {0 => text}]
+                           elsif text == "species" then return [:SPECIES, {0 => text}]
+                           elsif text == "null" then return [:NULL, {0 => text}]
+                           elsif text == "if" then return [:IF, {0 => text}]
+                           elsif text == "else" then return [:ELSE, {0 => text}]
+                           elsif text == "while" then return [:WHILE, {0 => text}]
+                           elsif text == "do" then return [:DO, {0 => text}]
+                           elsif text == "unless" then return [:UNLESS, {0 => text}]
+                           elsif text == "true" then return [:TRUE, {0 => "logic", 1 => true}]
+                           elsif text == "false" then return [:FALSE, {0 => "logic", 1 => false}]
+                           elsif text == "var" then return [:VAR, {0 => text}]
+                           elsif text == "say" then return [:SAY, {0 => text}]
+                           elsif text == "hear" then return [:HEAR, {0 => text}]
+                           elsif text == "itself" then return [:ITSELF, {0 => text}]
+                           elsif text == "funk" then return [:FUNK, {0 => text}]
+                           elsif text == "eternal" then return [:ETERNAL, {0 => text}]
+                           elsif text == "heirof" then return [:HEIROF, {0 => text}]
+                           elsif text == "reply" then return [:REPLY, {0 => text}]
+                           elsif text == "number" then return [:NUMBER, {0 => text}]
+                           elsif text == "decimal" then return [:DECIMAL, {0 => text}]
+                           elsif text == "char" then return [:CHAR, {0 => text}]
+                           elsif text == "string" then return [:STRING, {0 => text}]
+                           elsif text == "logic" then return [:LOGIC, {0 => text}]
+                           else return [:ID, {0 => text}] end }
 
 
       when (text = @ss.scan(/[0-9]+\.[0-9]+/))
-         action { [:CTED, text.to_f] }
+         action { [:CTED, {0 => "decimal", 1 => text.to_f}] }
 
       when (text = @ss.scan(/[0-9]+/))
-         action { [:CTEN, text.to_i] }
+         action { [:CTEN, {0 => "number", 1 => text.to_i}] }
 
       when (text = @ss.scan(/".*"/))
-         action { [:CTESTRING, text] }
+         action { [:CTESTRING, {0 => "string", 1 => text[1...-1]}] }
 
       when (text = @ss.scan(/!=/))
-         action { [:DIFFERENT, text] }
+         action { [:DIFFERENT, {0 => text}] }
 
       when (text = @ss.scan(/\|\|=/))
-         action { [:ORASSIGN, text] }
+         action { [:ORASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/&&=/))
-         action { [:ANDASSIGN, text] }
+         action { [:ANDASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/\+=/))
-         action { [:PLUSASSIGN, text] }
+         action { [:PLUSASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/\-=/))
-         action { [:MINUSASSIGN, text] }
+         action { [:MINUSASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/\*=/))
-         action { [:MULTASSIGN, text] }
+         action { [:MULTASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/\/=/))
-         action { [:DIVASSIGN, text] }
+         action { [:DIVASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/%=/))
-         action { [:MODASSIGN, text] }
+         action { [:MODASSIGN, {0 => text}] }
 
       when (text = @ss.scan(/==/))
-         action { [:EQUALITY, text] }
+         action { [:EQUALITY, {0 => text}] }
 
       when (text = @ss.scan(/\<=/))
-         action { [:LEQUAL, text] }
+         action { [:LEQUAL, {0 => text}] }
 
       when (text = @ss.scan(/\>=/))
-         action { [:MEQUAL, text] }
+         action { [:MEQUAL, {0 => text}] }
 
       when (text = @ss.scan(/&&/))
-         action { [:AND, text] }
+         action { [:AND, {0 => text}] }
 
       when (text = @ss.scan(/\|\|/))
-         action { [:OR, text] }
+         action { [:OR, {0 => text}] }
 
       when (text = @ss.scan(/!/))
-         action { [:NOT, text] }
+         action { [:NOT, {0 => text}] }
 
       when (text = @ss.scan(/%/))
-         action { [:MOD, text] }
+         action { [:MOD, {0 => text}] }
 
       when (text = @ss.scan(/\*/))
-         action { [:MULT, text]}
+         action { [:MULT, {0 => text}]}
 
       when (text = @ss.scan(/\//))
-         action { [:DIV, text]}
+         action { [:DIV, {0 => text}]}
 
       when (text = @ss.scan(/\+/))
-         action { [:PLUS, text]}
+         action { [:PLUS, {0 => text}]}
 
       when (text = @ss.scan(/\-/))
-         action { [:MINUS, text] }
+         action { [:MINUS, {0 => text}] }
 
       when (text = @ss.scan(/\(/))
-         action { [:PLEFT, text] }
+         action { [:PLEFT, {0 => text}] }
 
       when (text = @ss.scan(/\)/))
-         action { [:PRIGHT, text] }
+         action { [:PRIGHT, {0 => text}] }
 
       when (text = @ss.scan(/\{/))
-         action { [:BLEFT, text] }
+         action { [:BLEFT, {0 => text}] }
 
       when (text = @ss.scan(/\}/))
-         action { [:BRIGHT, text] }
+         action { [:BRIGHT, {0 => text}] }
 
       when (text = @ss.scan(/\[/))
-         action { [:SBLEFT, text] }
+         action { [:SBLEFT, {0 => text}] }
 
       when (text = @ss.scan(/\]/))
-         action { [:SBRIGHT, text] }
+         action { [:SBRIGHT, {0 => text}] }
 
       when (text = @ss.scan(/:/))
-         action { [:TWOP, text] }
+         action { [:TWOP, {0 => text}] }
 
       when (text = @ss.scan(/;/))
-         action { [:SEMIC, text] }
+         action { [:SEMIC, {0 => text}] }
 
       when (text = @ss.scan(/=/))
-         action { [:EQUAL, text] }
+         action { [:EQUAL, {0 => text}] }
 
       when (text = @ss.scan(/,/))
-         action { [:COMA, text] }
+         action { [:COMA, {0 => text}] }
 
       when (text = @ss.scan(/\./))
-         action { [:POINT, text] }
+         action { [:POINT, {0 => text}] }
 
       when (text = @ss.scan(/\</))
-         action { [:LTHAN, text] }
+         action { [:LTHAN, {0 => text}] }
 
       when (text = @ss.scan(/\>/))
-         action { [:MTHAN, text] }
+         action { [:MTHAN, {0 => text}] }
 
       else
         text = @ss.string[@ss.pos .. -1]

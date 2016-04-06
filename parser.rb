@@ -17,10 +17,73 @@ require 'racc/parser.rb'
   $actualType
   $actualMethod
   $actualScope
+  $semanticCube
+  $constantBook = Hash.new
+  $theMagicNumber = 10000
+  $magicReference = {
+    "global" => {
+      "number" => 0,
+      "decimal" => 1,
+      "string" => 2,
+      "char" => 3,
+      "logic" => 4
+    },
+    "local" => {
+      "number" => 5,
+      "decimal" => 6,
+      "string" => 7,
+      "char" => 8,
+      "logic" => 9
+    },
+    "temporal" => {
+      "number" => 10,
+      "decimal" => 11,
+      "string" => 12,
+      "char" => 13,
+      "logic" => 14
+    },
+    "constant" => {
+      "number" => 15,
+      "decimal" => 16,
+      "string" => 17,
+      "char" => 18,
+      "logic" => 19
+    }
+  }
+  $magicCounter = {
+    "global" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "local" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "temporal" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "constant" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    }
+  }
 
 class ObjectivePlox < Racc::Parser
 
-module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 284)
+module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 347)
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
   # Funcion que lee un archivo como entrada.
@@ -30,7 +93,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
 
   # para poder desplegar la linea en la que se encuentra el error.
   def on_error(t, val, vstack)
-    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val.inspect, token_to_str(t) || '?', $line_number)
+    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val[0].inspect, token_to_str(t) || '?', $line_number)
   end
 
   def newSpecies(species)
@@ -41,6 +104,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
       $speciesBook[species]["size"] = 0
       $actualSpecies = species
       $actualMethod = "species"
+      resetCounters("global")
       puts "species #{species} successfully defined"
     else
       abort("Semantic error: species '#{species}' is already defined. Error on line: #{$line_number}")
@@ -60,26 +124,34 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     if $actualMethod == "species"
       unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
         unless isValidType($actualType)
-          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
         end
         if $actualType == $actualSpecies
-          abort("Semantic error, you cannot have recursive species definitions. Error on line: #{$line_number}")
+          abort("Semantic error: you cannot have recursive species definitions. Error on line: #{$line_number}")
         end
         $speciesBook[$actualSpecies]["variables"][id] = Hash.new
         $speciesBook[$actualSpecies]["variables"][id]["type"] = $actualType
         $speciesBook[$actualSpecies]["variables"][id]["scope"] = $actualModifier
         $speciesBook[$actualSpecies]["variables"][id]["modifiable"] = $isVariable
+        if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+          $speciesBook[$actualSpecies]["variables"][id]["location"] = locationGenerator(1, "global", $actualType)
+        end
       else
-        abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+        abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
       end
     else
       if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
         unless isValidType($actualType)
-          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
         end
-        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = $actualType
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = Hash.new
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"] = $actualType
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
+        if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+        end
       else
-        abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+        abort("Semantic error: variable '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
       end
     end
   end
@@ -105,7 +177,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   def newMethod(id)
     unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "methods")
       unless isValidType($actualType) || $actualType == "oblivion"
-        abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+        abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
       end
       $speciesBook[$actualSpecies]["methods"][id] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["type"] = $actualType
@@ -114,21 +186,923 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
       $speciesBook[$actualSpecies]["methods"][id]["variables"] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["argumentList"] = []
       $actualMethod = id
+      resetCounters("local")
     else
-      abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+      abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
     end
   end
 
   def newArgument(type, id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
       unless isValidType(type)
-        abort("Semantic error, species '#{type}' is not defined. Error on line: #{$line_number}")
+        abort("Semantic error: species '#{type}' is not defined. Error on line: #{$line_number}")
       end
-      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = type
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = Hash.new
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"] = $actualType
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
+      if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+      end
       $speciesBook[$actualSpecies]["methods"][$actualMethod]["argumentList"].push(type)
     else
-      abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+      abort("Semantic error: argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
     end
+  end
+
+  def validateExpression(opLeft, opRight, operator)
+    if $semanticCube[opLeft][opRight][operator] == nil
+      abort("Semantic error: incompatible types #{opLeft} and #{opRight} with operator #{operator}, or invalid operation. Error on line: #{$line_number}")
+    end
+    return $semanticCube[opLeft][opRight][operator]
+  end
+
+  def newConstant(type, value)
+    if $constantBook[value] == nil
+      $constantBook[value] = locationGenerator(1, "constant", type)
+    end
+  end
+
+  def locationGenerator(size, scope, type)
+    if $theMagicNumber - $magicCounter[scope][type] >= size
+      location = $magicReference[scope][type] * $theMagicNumber + $magicCounter[scope][type]
+      $magicCounter[scope][type] += size
+      return location
+    else
+      abort("Compilation error: out of memory for a #{type} variable with the #{scope} scope. While compiling line: #{$line_number}")
+    end
+  end
+
+  def resetCounters(scope)
+    $magicCounter[scope]["number"] = 0
+    $magicCounter[scope]["decimal"] = 0
+    $magicCounter[scope]["string"] = 0
+    $magicCounter[scope]["char"] = 0
+    $magicCounter[scope]["logic"] = 0
+  end
+
+  def createCube()
+    $semanticCube = {
+      "logic" => {
+        "logic" => {
+          "!=" => "logic",
+          "||=" => "logic",
+          "&&=" => "logic",
+          "+=" => "logic",
+          "-=" => "logic",
+          "*=" => "logic",
+          "/=" => "error",
+          "%=" => "error",
+          "==" => "logic",
+          "<=" => "logic",
+          ">=" => "logic",
+          "&&" => "logic",
+          "||" => "logic",
+          "!" => "error",
+          "%" => "error",
+          "*" => "logic",
+          "/" => "error",
+          "+" => "logic",
+          "-" => "logic",
+          "(" => "error",
+          ")" => "error",
+          "{" => "error",
+          "}" => "error",
+          "[" => "error",
+          "]" => "error",
+          ":" => "error",
+          ";" => "error",
+          "=" => "logic",
+          "," => "error",
+          "." => "error",
+          "<" => "logic",
+          ">" => "logic"
+          },
+        "char" => {
+          "!=" => "logic",
+          "||=" => "logic",
+          "&&=" => "logic",
+          "+=" => "logic",
+          "-=" => "logic",
+          "*=" => "logic",
+          "/=" => "logic",
+          "%=" => "logic",
+          "==" => "logic",
+          "<=" => "logic",
+          ">=" => "logic",
+          "&&" => "logic",
+          "||" => "logic",
+          "!" => "error",
+          "%" => "logic",
+          "*" => "logic",
+          "/" => "logic",
+          "+" => "logic",
+          "-" => "logic",
+          "(" => "error",
+          ")" => "error",
+          "{" => "error",
+          "}" => "error",
+          "[" => "error",
+          "]" => "error",
+          ":" => "error",
+          ";" => "error",
+          "=" => "logic",
+          "," => "error",
+          "." => "error",
+          "<" => "logic",
+          ">" => "logic"
+          },
+        "number" => {
+          "!=" => "logic",
+          "||=" => "logic",
+          "&&=" => "logic",
+          "+=" => "number",
+          "-=" => "number",
+          "*=" => "number",
+          "/=" => "number",
+          "%=" => "error",
+          "==" => "error",
+          "<=" => "logic",
+          ">=" => "logic",
+          "&&" => "logic",
+          "||" => "logic",
+          "!" => "error",
+          "%" => "logic",
+          "*" => "logic",
+          "/" => "logic",
+          "+" => "logic",
+          "-" => "logic",
+          "(" => "error",
+          ")" => "error",
+          "{" => "error",
+          "}" => "error",
+          "[" => "error",
+          "]" => "error",
+          ":" => "error",
+          ";" => "error",
+          "=" => "logic",
+          "," => "error",
+          "." => "error",
+          "<" => "logic",
+          ">" => "logic"
+          },
+        "decimal" => {
+          "!=" => "logic",
+          "||=" => "logic",
+          "&&=" => "logic",
+          "+=" => "decimal",
+          "-=" => "decimal",
+          "*=" => "decimal",
+          "/=" => "decimal",
+          "%=" => "error",
+          "==" => "logic",
+          "<=" => "logic",
+          ">=" => "logic",
+          "&&" => "logic",
+          "||" => "logic",
+          "!" => "error",
+          "%" => "logic",
+          "*" => "logic",
+          "/" => "logic",
+          "+" => "logic",
+          "-" => "logic",
+          "(" => "error",
+          ")" => "error",
+          "{" => "error",
+          "}" => "error",
+          "[" => "error",
+          "]" => "error",
+          ":" => "error",
+          ";" => "error",
+          "=" => "logic",
+          "," => "error",
+          "." => "error",
+          "<" => "logic",
+          ">" => "logic"
+          },
+        "string" => {
+          "!=" => "error",
+          "||=" => "error",
+          "&&=" => "error",
+          "+=" => "error",
+          "-=" => "error",
+          "*=" => "error",
+          "/=" => "error",
+          "%=" => "error",
+          "==" => "error",
+          "<=" => "error",
+          ">=" => "error",
+          "&&" => "error",
+          "||" => "error",
+          "!" => "error",
+          "%" => "error",
+          "*" => "error",
+          "/" => "error",
+          "+" => "error",
+          "-" => "error",
+          "(" => "error",
+          ")" => "error",
+          "{" => "error",
+          "}" => "error",
+          "[" => "error",
+          "]" => "error",
+          ":" => "error",
+          ";" => "error",
+          "=" => "error",
+          "," => "error",
+          "." => "error",
+          "<" => "error",
+          ">" => "error"
+          }
+      },
+      "char" => {
+        "logic" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "char" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "number" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "decimal" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "string" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          }
+      },
+      "number" => {
+        "logic" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "char" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "number" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "decimal" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "string" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          }
+      },
+      "decimal" => {
+        "logic" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "char" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "number" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "decimal" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "string" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          }
+      },
+      "string" => {
+        "logic" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "char" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "number" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "decimal" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          },
+        "string" => {
+          "!=" => "",
+          "||=" => "",
+          "&&=" => "",
+          "+=" => "",
+          "-=" => "",
+          "*=" => "",
+          "/=" => "",
+          "%=" => "",
+          "==" => "",
+          "<=" => "",
+          ">=" => "",
+          "&&" => "",
+          "||" => "",
+          "!" => "",
+          "%" => "",
+          "*" => "",
+          "/" => "",
+          "+" => "",
+          "-" => "",
+          "(" => "",
+          ")" => "",
+          "{" => "",
+          "}" => "",
+          "[" => "",
+          "]" => "",
+          ":" => "",
+          ";" => "",
+          "=" => "",
+          "," => "",
+          "." => "",
+          "<" => "",
+          ">" => ""
+          }
+      }
+    }
   end
 ...end objective_plox_bison.y/module_eval...
 ##### State transition tables begin ###
@@ -796,7 +1770,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 14)
   def _reduce_1(val, _values, result)
-     puts "OP! Programa compilado exitosamente."; ap $speciesBook 
+     puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $constantBook
     result
   end
 .,.,
@@ -831,7 +1805,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 24)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 27)
   def _reduce_6(val, _values, result)
-     newSpecies(val[0]) 
+     newSpecies(val[0][0]) 
     result
   end
 .,.,
@@ -845,7 +1819,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 30)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 31)
   def _reduce_8(val, _values, result)
-     heirSpecies(val[1]) 
+     heirSpecies(val[1][0]) 
     result
   end
 .,.,
@@ -943,7 +1917,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 60)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 63)
   def _reduce_22(val, _values, result)
-     newVariable(val[0]) 
+     newVariable(val[0][0]) 
     result
   end
 .,.,
@@ -1083,7 +2057,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 111)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 114)
   def _reduce_47(val, _values, result)
-     newMethod(val[0]) 
+     newMethod(val[0][0]) 
     result
   end
 .,.,
@@ -1153,7 +2127,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 130)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 131)
   def _reduce_57(val, _values, result)
-     $actualType = val[0] 
+     $actualType = val[0][0] 
     result
   end
 .,.,
@@ -1349,7 +2323,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 180)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 183)
   def _reduce_85(val, _values, result)
-     newArgument(val[0], val[1]) 
+     newArgument(val[0][0], val[1][0]) 
     result
   end
 .,.,
@@ -1519,7 +2493,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 219)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 220)
   def _reduce_110(val, _values, result)
-    
+     puts val[0][0] 
     result
   end
 .,.,
@@ -1666,21 +2640,21 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 260)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 263)
   def _reduce_131(val, _values, result)
-    
+     newConstant(val[0][0], val[0][1]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 264)
   def _reduce_132(val, _values, result)
-    
+     newConstant(val[0][0], val[0][1]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 265)
   def _reduce_133(val, _values, result)
-    
+     newConstant(val[0][0], val[0][1]) 
     result
   end
 .,.,

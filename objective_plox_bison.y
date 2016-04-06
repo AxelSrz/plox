@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $constantBook}
 
   plox_generation:
     /* empty */                                       {}
@@ -25,11 +25,11 @@ rule
     SPECIES code_new_class code_heirof BLEFT class_body BRIGHT      {}
 
   code_new_class:
-    ID { newSpecies(val[0]) }
+    ID { newSpecies(val[0][0]) }
 
   code_heirof:
     /* empty */                                       {}
-    | HEIROF ID                                       { heirSpecies(val[1]) }
+    | HEIROF ID                                       { heirSpecies(val[1][0]) }
 
   class_body:
     class_variable_block class_function_block         {}
@@ -61,7 +61,7 @@ rule
     code_new_variable next_variable                   {}
 
   code_new_variable:
-    ID  { newVariable(val[0]) }
+    ID  { newVariable(val[0][0]) }
 
   next_variable:
     /* empty */                                       {}
@@ -112,7 +112,7 @@ rule
     | modifier                                        {}
 
   method_declaration2:
-    ID                                                { newMethod(val[0]) }
+    ID                                                { newMethod(val[0][0]) }
     | CHIEF                                           { newMethod("chief")}
 
   method_declaration3:
@@ -129,7 +129,7 @@ rule
     | CHAR                                            { $actualType = "char" }
     | NUMBER                                          { $actualType = "number" }
     | DECIMAL                                         { $actualType = "decimal" }
-    | ID                                              { $actualType = val[0] }
+    | ID                                              { $actualType = val[0][0] }
     | OBLIVION                                        { $actualType = "oblivion" }
     | STRING                                          { $actualType = "string" }
 
@@ -181,7 +181,7 @@ rule
     | arglist                                         {}
 
   parameter:
-    type ID parameter1                                { newArgument(val[0], val[1]) }
+    type ID parameter1                                { newArgument(val[0][0], val[1][0]) }
 
   parameter1:
     /* empty */                                       {}
@@ -261,9 +261,9 @@ rule
     | OR                                              {}
 
   literal_expression:
-    CTED                                              {}
-    | CTEN                                            {}
-    | CTESTRING                                       {}
+    CTED                                              { newConstant(val[0][0], val[0][1]) }
+    | CTEN                                            { newConstant(val[0][0], val[0][1]) }
+    | CTESTRING                                       { newConstant(val[0][0], val[0][1]) }
 
 end
 
@@ -280,7 +280,69 @@ end
   $actualMethod
   $actualScope
   $semanticCube
-  
+  $constantBook = Hash.new
+  $theMagicNumber = 10000
+  $magicReference = {
+    "global" => {
+      "number" => 0,
+      "decimal" => 1,
+      "string" => 2,
+      "char" => 3,
+      "logic" => 4
+    },
+    "local" => {
+      "number" => 5,
+      "decimal" => 6,
+      "string" => 7,
+      "char" => 8,
+      "logic" => 9
+    },
+    "temporal" => {
+      "number" => 10,
+      "decimal" => 11,
+      "string" => 12,
+      "char" => 13,
+      "logic" => 14
+    },
+    "constant" => {
+      "number" => 15,
+      "decimal" => 16,
+      "string" => 17,
+      "char" => 18,
+      "logic" => 19
+    }
+  }
+  $magicCounter = {
+    "global" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "local" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "temporal" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    },
+    "constant" => {
+      "number" => 0,
+      "decimal" => 0,
+      "string" => 0,
+      "char" => 0,
+      "logic" => 0
+    }
+  }
+
 ---- inner
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
@@ -291,7 +353,7 @@ end
 
   # para poder desplegar la linea en la que se encuentra el error.
   def on_error(t, val, vstack)
-    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val.inspect, token_to_str(t) || '?', $line_number)
+    raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val[0].inspect, token_to_str(t) || '?', $line_number)
   end
 
   def newSpecies(species)
@@ -302,6 +364,7 @@ end
       $speciesBook[species]["size"] = 0
       $actualSpecies = species
       $actualMethod = "species"
+      resetCounters("global")
       puts "species #{species} successfully defined"
     else
       abort("Semantic error: species '#{species}' is already defined. Error on line: #{$line_number}")
@@ -321,26 +384,34 @@ end
     if $actualMethod == "species"
       unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
         unless isValidType($actualType)
-          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
         end
         if $actualType == $actualSpecies
-          abort("Semantic error, you cannot have recursive species definitions. Error on line: #{$line_number}")
+          abort("Semantic error: you cannot have recursive species definitions. Error on line: #{$line_number}")
         end
         $speciesBook[$actualSpecies]["variables"][id] = Hash.new
         $speciesBook[$actualSpecies]["variables"][id]["type"] = $actualType
         $speciesBook[$actualSpecies]["variables"][id]["scope"] = $actualModifier
         $speciesBook[$actualSpecies]["variables"][id]["modifiable"] = $isVariable
+        if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+          $speciesBook[$actualSpecies]["variables"][id]["location"] = locationGenerator(1, "global", $actualType)
+        end
       else
-        abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+        abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
       end
     else
       if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
         unless isValidType($actualType)
-          abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
         end
-        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = $actualType
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = Hash.new
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"] = $actualType
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
+        if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+        end
       else
-        abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+        abort("Semantic error: variable '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
       end
     end
   end
@@ -366,7 +437,7 @@ end
   def newMethod(id)
     unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "methods")
       unless isValidType($actualType) || $actualType == "oblivion"
-        abort("Semantic error, species '#{$actualType}' is not defined. Error on line: #{$line_number}")
+        abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
       end
       $speciesBook[$actualSpecies]["methods"][id] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["type"] = $actualType
@@ -375,21 +446,58 @@ end
       $speciesBook[$actualSpecies]["methods"][id]["variables"] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["argumentList"] = []
       $actualMethod = id
+      resetCounters("local")
     else
-      abort("Semantic error, variable '#{id}' is already defined. Error on line: #{$line_number}")
+      abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
     end
   end
 
   def newArgument(type, id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
       unless isValidType(type)
-        abort("Semantic error, species '#{type}' is not defined. Error on line: #{$line_number}")
+        abort("Semantic error: species '#{type}' is not defined. Error on line: #{$line_number}")
       end
-      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = type
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = Hash.new
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"] = $actualType
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
+      if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+      end
       $speciesBook[$actualSpecies]["methods"][$actualMethod]["argumentList"].push(type)
     else
-      abort("Semantic error, argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+      abort("Semantic error: argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
     end
+  end
+
+  def validateExpression(opLeft, opRight, operator)
+    if $semanticCube[opLeft][opRight][operator] == nil
+      abort("Semantic error: incompatible types #{opLeft} and #{opRight} with operator #{operator}, or invalid operation. Error on line: #{$line_number}")
+    end
+    return $semanticCube[opLeft][opRight][operator]
+  end
+
+  def newConstant(type, value)
+    if $constantBook[value] == nil
+      $constantBook[value] = locationGenerator(1, "constant", type)
+    end
+  end
+
+  def locationGenerator(size, scope, type)
+    if $theMagicNumber - $magicCounter[scope][type] >= size
+      location = $magicReference[scope][type] * $theMagicNumber + $magicCounter[scope][type]
+      $magicCounter[scope][type] += size
+      return location
+    else
+      abort("Compilation error: out of memory for a #{type} variable with the #{scope} scope. While compiling line: #{$line_number}")
+    end
+  end
+
+  def resetCounters(scope)
+    $magicCounter[scope]["number"] = 0
+    $magicCounter[scope]["decimal"] = 0
+    $magicCounter[scope]["string"] = 0
+    $magicCounter[scope]["char"] = 0
+    $magicCounter[scope]["logic"] = 0
   end
 
   def createCube()
@@ -1255,8 +1363,4 @@ end
           }
       }
     }
-  end
-
-  def cubeValidation(left, right, operator)
-    # Introducir validacion para el cubo
   end
