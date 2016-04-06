@@ -134,11 +134,11 @@ rule
     | STRING                                          { $actualType = "string" }
 
   num_operator:
-    MULT                                              {}
-    | DIV                                             {}
-    | MOD                                             {}
-    | PLUS                                            {}
-    | MINUS                                           {}
+    MULT                                              { $operatorStack.push(val[0][0]) }
+    | DIV                                             { $operatorStack.push(val[0][0]) }
+    | MOD                                             { $operatorStack.push(val[0][0]) }
+    | PLUS                                            { $operatorStack.push(val[0][0]) }
+    | MINUS                                           { $operatorStack.push(val[0][0]) }
 
   variable_value:
     expression                                        {}
@@ -211,7 +211,7 @@ rule
     | expression
 
   expression:
-    expression num_operator expression                {}
+    expression num_operator expression                { validateArithmeticExpression() }
     | expression testing_operator expression          {}
     | NOT expression                                  {}
     | expression boolean_operator expression          {}
@@ -279,7 +279,9 @@ end
   $actualType
   $actualMethod
   $actualScope
-  $semanticCube
+  $operatorStack = Array.new
+  $operandStack = Array.new
+  $vectorCuadruplo = Array.new
   $constantBook = Hash.new
   $theMagicNumber = 10000
   $magicReference = {
@@ -340,6 +342,165 @@ end
       "string" => 0,
       "char" => 0,
       "logic" => 0
+    }
+  }
+  $semanticCube = {
+    "logic" => {
+      "logic" => {
+        "!=" => "logic",
+        "||=" => "logic",
+        "&&=" => "logic",
+        "==" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "logic"
+      },
+      "char" => {
+      },
+      "number" => {
+      },
+      "decimal" => {
+      },
+      "string" => {
+      }
+    },
+    "char" => {
+      "logic" => {
+      },
+      "char" => {
+        "!=" => "logic",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "char",
+        "<" => "logic",
+        ">" => "logic"
+      },
+      "number" => {
+      },
+      "decimal" => {
+      },
+      "string" => {
+      }
+    },
+    "number" => {
+      "logic" => {
+      },
+      "char" => {
+      },
+      "number" => {
+        "!=" => "logic",
+        "+=" => "number",
+        "-=" => "number",
+        "*=" => "number",
+        "/=" => "number",
+        "%=" => "number",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "number",
+        "*" => "number",
+        "/" => "number",
+        "+" => "number",
+        "-" => "number",
+        "=" => "number",
+        "<" => "logic",
+        ">" => "logic"
+      },
+      "decimal" => {
+        "!=" => "logic",
+        "+=" => "number",
+        "-=" => "number",
+        "*=" => "number",
+        "/=" => "number",
+        "%=" => "number",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "number",
+        "*" => "number",
+        "/" => "number",
+        "+" => "number",
+        "-" => "number",
+        "=" => "number",
+        "<" => "logic",
+        ">" => "logic"
+      },
+      "string" => {
+      }
+    },
+    "decimal" => {
+      "logic" => {
+      },
+      "char" => {
+      },
+      "number" => {
+        "!=" => "logic",
+        "+=" => "number",
+        "-=" => "number",
+        "*=" => "number",
+        "/=" => "number",
+        "%=" => "number",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "number",
+        "*" => "number",
+        "/" => "number",
+        "+" => "number",
+        "-" => "number",
+        "=" => "number",
+        "<" => "logic",
+        ">" => "logic"
+      },
+      "decimal" => {
+        "!=" => "logic",
+        "+=" => "decimal",
+        "-=" => "decimal",
+        "*=" => "decimal",
+        "/=" => "decimal",
+        "%=" => "decimal",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "decimal",
+        "*" => "decimal",
+        "/" => "decimal",
+        "+" => "decimal",
+        "-" => "decimal",
+        "=" => "decimal",
+        "<" => "logic",
+        ">" => "logic"
+      },
+      "string" => {
+      }
+    },
+    "string" => {
+      "logic" => {
+      },
+      "char" => {
+      },
+      "number" => {
+      },
+      "decimal" => {
+      },
+      "string" => {
+        "!=" => "logic",
+        "==" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "string",
+      }
     }
   }
 
@@ -500,164 +661,20 @@ end
     $magicCounter[scope]["logic"] = 0
   end
 
-  def createCube()
-    $semanticCube = {
-      "logic" => {
-        "logic" => {
-          "!=" => "logic",
-          "||=" => "logic",
-          "&&=" => "logic",
-          "==" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "=" => "logic"
-        },
-        "char" => {
-        },
-        "number" => {
-        },
-        "decimal" => {
-        },
-        "string" => {
-        }
-      },
-      "char" => {
-        "logic" => {
-        },
-        "char" => {
-          "!=" => "logic",
-          "==" => "logic",
-          "<=" => "logic",
-          ">=" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "=" => "char",
-          "<" => "logic",
-          ">" => "logic"
-        },
-        "number" => {
-        },
-        "decimal" => {
-        },
-        "string" => {
-        }
-      },
-      "number" => {
-        "logic" => {
-        },
-        "char" => {
-        },
-        "number" => {
-          "!=" => "logic",
-          "+=" => "number",
-          "-=" => "number",
-          "*=" => "number",
-          "/=" => "number",
-          "%=" => "number",
-          "==" => "logic",
-          "<=" => "logic",
-          ">=" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "%" => "number",
-          "*" => "number",
-          "/" => "number",
-          "+" => "number",
-          "-" => "number",
-          "=" => "number",
-          "<" => "logic",
-          ">" => "logic"
-        },
-        "decimal" => {
-          "!=" => "logic",
-          "+=" => "number",
-          "-=" => "number",
-          "*=" => "number",
-          "/=" => "number",
-          "%=" => "number",
-          "==" => "logic",
-          "<=" => "logic",
-          ">=" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "%" => "number",
-          "*" => "number",
-          "/" => "number",
-          "+" => "number",
-          "-" => "number",
-          "=" => "number",
-          "<" => "logic",
-          ">" => "logic"
-        },
-        "string" => {
-        }
-      },
-      "decimal" => {
-        "logic" => {
-        },
-        "char" => {
-        },
-        "number" => {
-          "!=" => "logic",
-          "+=" => "number",
-          "-=" => "number",
-          "*=" => "number",
-          "/=" => "number",
-          "%=" => "number",
-          "==" => "logic",
-          "<=" => "logic",
-          ">=" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "%" => "number",
-          "*" => "number",
-          "/" => "number",
-          "+" => "number",
-          "-" => "number",
-          "=" => "number",
-          "<" => "logic",
-          ">" => "logic"
-        },
-        "decimal" => {
-          "!=" => "logic",
-          "+=" => "decimal",
-          "-=" => "decimal",
-          "*=" => "decimal",
-          "/=" => "decimal",
-          "%=" => "decimal",
-          "==" => "logic",
-          "<=" => "logic",
-          ">=" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "%" => "decimal",
-          "*" => "decimal",
-          "/" => "decimal",
-          "+" => "decimal",
-          "-" => "decimal",
-          "=" => "decimal",
-          "<" => "logic",
-          ">" => "logic"
-        },
-        "string" => {
-        }
-      },
-      "string" => {
-        "logic" => {
-        },
-        "char" => {
-        },
-        "number" => {
-        },
-        "decimal" => {
-        },
-        "string" => {
-          "!=" => "logic",
-          "==" => "logic",
-          "&&" => "logic",
-          "||" => "logic",
-          "=" => "string",
-        }
-      }
-    }
+  def validateArithmeticExpression()
+    if $operatorStack.top() == '*' || $operatorStack.top() == '/' ||
+       $operatorStack.top() == '+' || $operatorStack.top() == '-' ||
+       $operatorStack.top() == '%'
+      op = $operatorStack.pop()
+      rightOp = $operandStack.pop()
+      leftOp = $operandStack.pop()
+      createCuadruplo(op, rightOp, leftOp)
+    end
+  end
+
+  def createCuadruplo(op, right, left)
+    $vectorCuadruplo.push(op)
+    $vectorCuadruplo.push(left)
+    $vectorCuadruplo.push(right)
+    $vectorCuadruplo.push() #Aqui falta mandar el temporal
   end
