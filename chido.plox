@@ -27,7 +27,7 @@ habemvs species Persona {
   funk open oblivion setApellido(string apellido) {
     iApellido = apellido;
   }
-};
+}
 
 habemvs species Estudiante heirof Persona {
   var hidden number nMatricula;
@@ -45,7 +45,7 @@ habemvs species Estudiante heirof Persona {
   funk open oblivion setPromedio(decimal promedio) {
     dPromedio = promedio;
   }
-};
+}
 
 habemvs species EjemploObjectivePlox {
   var Estudiante estEstudiante;
@@ -73,10 +73,14 @@ habemvs species EjemploObjectivePlox {
 
     while(media < pi) {
       media = media + 3;
+      while(media < pi){
+        media = media + 3;
+      }
+      media = media + 3;
     }
 
     say("La media es igual a:");
     say(media);
   }
 
-};
+}

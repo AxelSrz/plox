@@ -19,7 +19,7 @@ rule
     | type_declaration plox_generation                {}
 
   type_declaration:
-    HABEMVS class_declaration SEMIC                   {}
+    HABEMVS class_declaration                         {}
 
   class_declaration:
     SPECIES code_new_class code_heirof BLEFT class_body BRIGHT      {}
@@ -188,18 +188,12 @@ rule
 
   statement:
     variable_assignment SEMIC                         {}
-    | SAY PLEFT expression PRIGHT SEMIC               {}
-    | statement_block                                 {}
+    | SAY PLEFT expression PRIGHT SEMIC                                {}
     | unless_statement                                {}
     | if_statement                                    {}
     | do_statement                                    {}
-    | while_statement                                 {}
-    | REPLY statement1 SEMIC                          {}
-    | SEMIC                                           {}
-
-  statement1:
-    /* empty */                                       {}
-    | expression
+    | while_statement                                 { endWhile() }
+    | REPLY expression SEMIC                          {}
 
   expression:
     expression SUM expression                { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
@@ -231,24 +225,24 @@ rule
     | COMA arglist                                    {}
 
   unless_statement:
-    UNLESS PLEFT expression PRIGHT statement unless_statement1    {}
+    UNLESS PLEFT expression PRIGHT statement_block unless_statement1    {}
 
   unless_statement1:
     /* empty */                                       {}
-    | ELSE statement                                  {}
+    | ELSE statement_block                                  {}
 
   if_statement:
-    IF PLEFT expression PRIGHT statement if_statement1  {}
+    IF PLEFT expression PRIGHT statement_block if_statement1  {}
 
   if_statement1:
     /* empty */                                       {}
-    | ELSE statement                                  {}
+    | ELSE statement_block                                  {}
 
   do_statement:
-    DO statement WHILE PLEFT expression PRIGHT SEMIC  {}
+    DO statement_block WHILE PLEFT expression PRIGHT SEMIC  {}
 
   while_statement:
-    WHILE push_cont_jump PLEFT validateLogicexp PRIGHT statement    { endWhile() }
+    WHILE push_cont_jump validateLogicexp statement_block    {}
 
   push_cont_jump:
     /* empty */                                       { $jumpStack.push($quadrupleVector.count()) }
@@ -757,6 +751,7 @@ end
       return result
     else
       abort("Semantic error: type mismatch. Cannot negate non-logic values ('#{opHash[0]}'). Error on line: #{$line_number}")
+    end
   end
 
   def retrieveIdLocation(id)
@@ -788,12 +783,13 @@ end
       action = "gotoT"
     end
     quadruple = [action, exp[1], nil, nil]
+    $quadrupleVector.push(quadruple)
     $jumpStack.push($quadrupleVector.count()-1)
   end
 
   def endWhile()
     aux = $jumpStack.pop(2)
-    quadruple = ["goto", nil, nil, aux[1]]
+    quadruple = ["goto", nil, nil, aux[0]]
     $quadrupleVector.push(quadruple)
-    $quadrupleVector[aux[0]][3] = $quadrupleVector.count()
+    $quadrupleVector[aux[1]][3] = $quadrupleVector.count()
   end

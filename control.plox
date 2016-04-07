@@ -1,0 +1,15 @@
+habemvs species EjemploObjectivePlox {
+    var hidden number a;
+    var open number b, c;
+
+    funk open oblivion chief() {
+        a = 50;
+        while ( a > b || true ) {
+            b = a + c;
+            while (a + b > 1) {
+                b = c;
+            }
+        }
+        say(a - c / 4);
+    }
+}
