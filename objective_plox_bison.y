@@ -245,7 +245,10 @@ rule
     | ELSE statement                                  {}
 
   do_statement:
-    DO statement WHILE PLEFT expression PRIGHT SEMIC  {}
+    DO push_cont_jump statement WHILE PLEFT validateDoWhileExp PRIGHT SEMIC  {}
+
+  validateDoWhileExp:
+    expression                                          { generateDoWhileQuadruple(val[0]) }
 
   while_statement:
     WHILE push_cont_jump PLEFT validateLogicexp PRIGHT statement    { endWhile() }
@@ -757,6 +760,7 @@ end
       return result
     else
       abort("Semantic error: type mismatch. Cannot negate non-logic values ('#{opHash[0]}'). Error on line: #{$line_number}")
+    end
   end
 
   def retrieveIdLocation(id)
@@ -788,7 +792,17 @@ end
       action = "gotoT"
     end
     quadruple = [action, exp[1], nil, nil]
+    $quadrupleVector.push(quadruple)
     $jumpStack.push($quadrupleVector.count()-1)
+  end
+
+  def generateDoWhileQuadruple(exp, goToType)
+    unless exp[0] == "logic"
+      abort("Semantic error: type mismatch. Control expression is not logic type. Error on line: #{$line_number}")
+    end
+    retorno = $jumpStack.pop()
+    quadruple = ["gotoF", exp[1], nil, retorno]
+    $quadrupleVector.push(quadruple)
   end
 
   def endWhile()
