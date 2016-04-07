@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $constantBook}
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $constantBook; ap $quadrupleVector}
 
   plox_generation:
     /* empty */                                       {}
@@ -78,21 +78,20 @@ rule
     SBLEFT expression SBRIGHT type1           {}
 
   variable_assignment:
-    ID variable_assignment1 assign_operator variable_value      {}
+    ID variable_assignment1 EQUAL variable_value          { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 PLUSASSIGN variable_value   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MINUSASSIGN variable_value  { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MULTASSIGN variable_value   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 DIVASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 ORASSIGN variable_value     { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 ANDASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MODASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+
 
   variable_assignment1:
     /* empty */                                       {}
     | variable_assignment4 variable_assignment5       {}
 
-  assign_operator:
-    EQUAL                                             {}
-    | PLUSASSIGN
-    | MINUSASSIGN
-    | MULTASSIGN
-    | DIVASSIGN
-    | ORASSIGN
-    | ANDASSIGN
-    | MODASSIGN
 
   variable_assignment4:
     SBLEFT expression SBRIGHT variable_assignment5      {}
@@ -133,13 +132,6 @@ rule
     | OBLIVION                                        { $actualType = "oblivion" }
     | STRING                                          { $actualType = "string" }
 
-  num_operator:
-    MULT                                              { $operatorStack.push(val[0][0]) }
-    | DIV                                             { $operatorStack.push(val[0][0]) }
-    | MOD                                             { $operatorStack.push(val[0][0]) }
-    | PLUS                                            { $operatorStack.push(val[0][0]) }
-    | MINUS                                           { $operatorStack.push(val[0][0]) }
-
   variable_value:
     expression                                        {}
     | HEAR PLEFT PRIGHT                               {}
@@ -165,7 +157,7 @@ rule
   reference_expression:
     NULL                                              {}
     | ITSELF                                          {}
-    | ID                                              {}
+    | ID                                              { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
     | reference_expression2                           {}
 
   reference_expression2:
@@ -197,7 +189,6 @@ rule
   statement:
     variable_assignment SEMIC                         {}
     | SAY PLEFT expression PRIGHT SEMIC               {}
-    | expression SEMIC                                {}
     | statement_block                                 {}
     | unless_statement                                {}
     | if_statement                                    {}
@@ -211,13 +202,24 @@ rule
     | expression
 
   expression:
-    expression num_operator expression                { validateArithmeticExpression() }
-    | expression testing_operator expression          {}
-    | NOT expression                                  {}
-    | expression boolean_operator expression          {}
-    | TRUE                                            {}
-    | FALSE                                           {}
-    | PLEFT expression PRIGHT                         {}
+    expression SUM expression                { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression DIV expression              { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression MOD expression              { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression PLUS expression             { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression MINUS expression            { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression MULT expression             { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression MTHAN expression            { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression LTHAN expression            { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression MEQUAL expression           { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression LEQUAL expression           { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression EQUALITY expression         { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression DIFFERENT expression        { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | NOT expression                         { val[0][1] = createNotQuadruple(val[0]) }
+    | expression AND expression              { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | expression OR expression               { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
+    | TRUE                                   { val[0][1] = $trueLocation }
+    | FALSE                                  { val[0][1] = $falseLocation }
+    | PLEFT expression PRIGHT                { val[0][0] = val[1][0]; val[0][1] = val[1][1] }
     | literal_expression                              {}
     | reference_expression                            {}
 
@@ -248,22 +250,10 @@ rule
   while_statement:
     WHILE PLEFT expression PRIGHT statement           {}
 
-  testing_operator:
-    MTHAN                                             {}
-    | LTHAN                                           {}
-    | MEQUAL                                          {}
-    | LEQUAL                                          {}
-    | EQUALITY                                        {}
-    | DIFFERENT                                       {}
-
-  boolean_operator:
-    AND                                               {}
-    | OR                                              {}
-
   literal_expression:
-    CTED                                              { newConstant(val[0][0], val[0][1]) }
-    | CTEN                                            { newConstant(val[0][0], val[0][1]) }
-    | CTESTRING                                       { newConstant(val[0][0], val[0][1]) }
+    CTED                                              { val[0][1] = newConstant(val[0][0], val[0][1]) }
+    | CTEN                                            { val[0][1] = newConstant(val[0][0], val[0][1]) }
+    | CTESTRING                                       { val[0][1] = newConstant(val[0][0], val[0][1]) }
 
 end
 
@@ -281,7 +271,7 @@ end
   $actualScope
   $operatorStack = Array.new
   $operandStack = Array.new
-  $vectorCuadruplo = Array.new
+  $quadrupleVector = Array.new
   $constantBook = Hash.new
   $theMagicNumber = 10000
   $magicReference = {
@@ -362,6 +352,15 @@ end
       "decimal" => {
       },
       "string" => {
+      },
+      "hear" => {
+        "!=" => "logic",
+        "||=" => "logic",
+        "&&=" => "logic",
+        "==" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "logic"
       }
     },
     "char" => {
@@ -383,6 +382,17 @@ end
       "decimal" => {
       },
       "string" => {
+      },
+      "hear" => {
+        "!=" => "logic",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "char",
+        "<" => "logic",
+        ">" => "logic"
       }
     },
     "number" => {
@@ -433,6 +443,27 @@ end
         ">" => "logic"
       },
       "string" => {
+      },
+      "hear" => {
+        "!=" => "logic",
+        "+=" => "number",
+        "-=" => "number",
+        "*=" => "number",
+        "/=" => "number",
+        "%=" => "number",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "number",
+        "*" => "number",
+        "/" => "number",
+        "+" => "number",
+        "-" => "number",
+        "=" => "number",
+        "<" => "logic",
+        ">" => "logic"
       }
     },
     "decimal" => {
@@ -483,6 +514,27 @@ end
         ">" => "logic"
       },
       "string" => {
+      },
+      "hear" => {
+        "!=" => "logic",
+        "+=" => "decimal",
+        "-=" => "decimal",
+        "*=" => "decimal",
+        "/=" => "decimal",
+        "%=" => "decimal",
+        "==" => "logic",
+        "<=" => "logic",
+        ">=" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "%" => "decimal",
+        "*" => "decimal",
+        "/" => "decimal",
+        "+" => "decimal",
+        "-" => "decimal",
+        "=" => "decimal",
+        "<" => "logic",
+        ">" => "logic"
       }
     },
     "string" => {
@@ -500,10 +552,18 @@ end
         "&&" => "logic",
         "||" => "logic",
         "=" => "string",
+      },
+      "hear" => {
+        "!=" => "logic",
+        "==" => "logic",
+        "&&" => "logic",
+        "||" => "logic",
+        "=" => "string",
       }
     }
   }
-
+  $falseLocation = $magicReference["constant"]["logic"] * $theMagicNumber
+  $trueLocation = $falseLocation + 1
 ---- inner
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
@@ -630,17 +690,19 @@ end
     end
   end
 
-  def validateExpression(opLeft, opRight, operator)
-    if $semanticCube[opLeft][opRight][operator] == nil
-      abort("Semantic error: incompatible types #{opLeft} and #{opRight} with operator #{operator}, or invalid operation. Error on line: #{$line_number}")
+  def expressionResultType(operator, leftOp, rightOp)
+    puts "Cube call with leftOp: #{leftOp}, rightOp: #{rightOp} and operator: #{operator} on line: #{$line_number}"
+    if $semanticCube[leftOp][rightOp][operator] == nil
+      abort("Semantic error: type mismatch. Cannot combine type '#{leftOp}' and type '#{rightOp}' with operator '#{operator}'. Error on line: #{$line_number}")
     end
-    return $semanticCube[opLeft][opRight][operator]
+    return $semanticCube[leftOp][rightOp][operator]
   end
 
   def newConstant(type, value)
     if $constantBook[value] == nil
       $constantBook[value] = locationGenerator(1, "constant", type)
     end
+    return $constantBook[value]
   end
 
   def locationGenerator(size, scope, type)
@@ -661,20 +723,51 @@ end
     $magicCounter[scope]["logic"] = 0
   end
 
-  def validateArithmeticExpression()
-    if $operatorStack.top() == '*' || $operatorStack.top() == '/' ||
-       $operatorStack.top() == '+' || $operatorStack.top() == '-' ||
-       $operatorStack.top() == '%'
-      op = $operatorStack.pop()
-      rightOp = $operandStack.pop()
-      leftOp = $operandStack.pop()
-      createCuadruplo(op, rightOp, leftOp)
+  def createExpressionQuadruple(operator, leftOp, rightOp, tempType)
+    temporal = locationGenerator(1, "temporal", tempType)
+    cuadruplo = [operator, leftOp, rightOp, temporal]
+    $quadrupleVector.push(cuadruplo)
+    return temporal
+  end
+
+  def createAssignQuadruple(operator, leftOpHash, rightOpHash)
+    # puts "Assign Q leftOp: #{leftOpHash}, rightOp: #{rightOpHash} and operator: #{operator} on line: #{$line_number}"
+    leftOp = retrieveIdLocation(leftOpHash[0])
+    leftOpType = retrieveIdType(leftOpHash[0])
+    expressionResultType(operator, leftOpType, rightOpHash[0])
+    if rightOpHash[0] == "hear"
+      cuadruplo = [operator, nil, rightOpHash[0], leftOp]
+    else
+      cuadruplo = [operator, nil, rightOpHash[1], leftOp]
+    end
+    $quadrupleVector.push(cuadruplo)
+  end
+
+  def createNotQuadruple(opHash)
+    if opHash[0] == "logic"
+      result = locationGenerator(1, "temporal", "logic")
+      cuadruplo = ["!", nil, opHash[1], result]
+      return result
+    else
+      abort("Semantic error: type mismatch. Cannot negate non-logic values ('#{opHash[0]}'). Error on line: #{$line_number}")
+  end
+
+  def retrieveIdLocation(id)
+    if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
+      return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"]
+    elsif $speciesBook[$actualSpecies]["variables"][id] != nil
+      return $speciesBook[$actualSpecies]["variables"][id]["location"]
+    else
+      abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
     end
   end
 
-  def createCuadruplo(op, right, left)
-    $vectorCuadruplo.push(op)
-    $vectorCuadruplo.push(left)
-    $vectorCuadruplo.push(right)
-    $vectorCuadruplo.push() #Aqui falta mandar el temporal
+  def retrieveIdType(id)
+    if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
+      return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"]
+    elsif $speciesBook[$actualSpecies]["variables"][id] != nil
+      return $speciesBook[$actualSpecies]["variables"][id]["type"]
+    else
+      abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
+    end
   end

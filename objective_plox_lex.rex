@@ -50,7 +50,7 @@ rule
   \<=                    { [:LEQUAL, {0 => text}] }
   \>=                    { [:MEQUAL, {0 => text}] }
   &&                     { [:AND, {0 => text}] }
-  \|\|                    { [:OR, {0 => text}] }
+  \|\|                   { [:OR, {0 => text}] }
   !                      { [:NOT, {0 => text}] }
   %                      { [:MOD, {0 => text}] }
   \*                     { [:MULT, {0 => text}]}
