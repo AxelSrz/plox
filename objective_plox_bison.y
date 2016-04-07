@@ -248,7 +248,13 @@ rule
     DO statement WHILE PLEFT expression PRIGHT SEMIC  {}
 
   while_statement:
-    WHILE PLEFT expression PRIGHT statement           {}
+    WHILE push_cont_jump PLEFT validateLogicexp PRIGHT statement    { endWhile() }
+
+  push_cont_jump:
+    /* empty */                                       { $jumpStack.push($quadrupleVector.count()) }
+
+  validateLogicexp:
+    expression                                        { generateLogicControlQuadruple(val[0], false) }
 
   literal_expression:
     CTED                                              { val[0][1] = newConstant(val[0][0], val[0][1]) }
@@ -564,6 +570,7 @@ end
   }
   $falseLocation = $magicReference["constant"]["logic"] * $theMagicNumber
   $trueLocation = $falseLocation + 1
+  $jumpStack = Array.new
 ---- inner
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
@@ -725,8 +732,8 @@ end
 
   def createExpressionQuadruple(operator, leftOp, rightOp, tempType)
     temporal = locationGenerator(1, "temporal", tempType)
-    cuadruplo = [operator, leftOp, rightOp, temporal]
-    $quadrupleVector.push(cuadruplo)
+    quadruple = [operator, leftOp, rightOp, temporal]
+    $quadrupleVector.push(quadruple)
     return temporal
   end
 
@@ -736,17 +743,17 @@ end
     leftOpType = retrieveIdType(leftOpHash[0])
     expressionResultType(operator, leftOpType, rightOpHash[0])
     if rightOpHash[0] == "hear"
-      cuadruplo = [operator, nil, rightOpHash[0], leftOp]
+      quadruple = [operator, nil, rightOpHash[0], leftOp]
     else
-      cuadruplo = [operator, nil, rightOpHash[1], leftOp]
+      quadruple = [operator, nil, rightOpHash[1], leftOp]
     end
-    $quadrupleVector.push(cuadruplo)
+    $quadrupleVector.push(quadruple)
   end
 
   def createNotQuadruple(opHash)
     if opHash[0] == "logic"
       result = locationGenerator(1, "temporal", "logic")
-      cuadruplo = ["!", nil, opHash[1], result]
+      quadruple = ["!", nil, opHash[1], result]
       return result
     else
       abort("Semantic error: type mismatch. Cannot negate non-logic values ('#{opHash[0]}'). Error on line: #{$line_number}")
@@ -770,4 +777,23 @@ end
     else
       abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
     end
+  end
+
+  def generateLogicControlQuadruple(exp, goToType)
+    unless exp[0] == "logic"
+      abort("Semantic error: type mismatch. Control expression is not logic type. Error on line: #{$line_number}")
+    end
+    action = "gotoF"
+    if goToType
+      action = "gotoT"
+    end
+    quadruple = [action, exp[1], nil, nil]
+    $jumpStack.push($quadrupleVector.count()-1)
+  end
+
+  def endWhile()
+    aux = $jumpStack.pop(2)
+    quadruple = ["goto", nil, nil, aux[1]]
+    $quadrupleVector.push(quadruple)
+    $quadrupleVector[aux[0]][3] = $quadrupleVector.count()
   end
