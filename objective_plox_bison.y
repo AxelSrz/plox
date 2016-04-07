@@ -225,21 +225,24 @@ rule
     | COMA arglist                                    {}
 
   unless_statement:
-    UNLESS PLEFT expression PRIGHT statement_block unless_statement1    {}
+    UNLESS expression statement_block unless_statement1    {}
 
   unless_statement1:
     /* empty */                                       {}
     | ELSE statement_block                                  {}
 
   if_statement:
-    IF PLEFT expression PRIGHT statement_block if_statement1  {}
+    IF expression statement_block if_statement1  {}
 
   if_statement1:
     /* empty */                                       {}
     | ELSE statement_block                                  {}
 
   do_statement:
-    DO statement_block WHILE PLEFT expression PRIGHT SEMIC  {}
+    DO push_cont_jump statement_block WHILE validateDoWhileExp SEMIC  {}
+
+  validateDoWhileExp:
+    expression                                          { generateDoWhileQuadruple(val[0]) }
 
   while_statement:
     WHILE push_cont_jump validateLogicexp statement_block    {}
@@ -785,6 +788,15 @@ end
     quadruple = [action, exp[1], nil, nil]
     $quadrupleVector.push(quadruple)
     $jumpStack.push($quadrupleVector.count()-1)
+  end
+
+  def generateDoWhileQuadruple(exp, goToType)
+    unless exp[0] == "logic"
+      abort("Semantic error: type mismatch. Control expression is not logic type. Error on line: #{$line_number}")
+    end
+    retorno = $jumpStack.pop()
+    quadruple = ["gotoF", exp[1], nil, retorno]
+    $quadrupleVector.push(quadruple)
   end
 
   def endWhile()

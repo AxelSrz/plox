@@ -133,19 +133,20 @@ rule 111 expression: reference_expression
 rule 112 arglist: expression arglist1
 rule 113 arglist1: 
 rule 114 arglist1: COMA arglist
-rule 115 unless_statement: UNLESS PLEFT expression PRIGHT statement_block unless_statement1
+rule 115 unless_statement: UNLESS expression statement_block unless_statement1
 rule 116 unless_statement1: 
 rule 117 unless_statement1: ELSE statement_block
-rule 118 if_statement: IF PLEFT expression PRIGHT statement_block if_statement1
+rule 118 if_statement: IF expression statement_block if_statement1
 rule 119 if_statement1: 
 rule 120 if_statement1: ELSE statement_block
-rule 121 do_statement: DO statement_block WHILE PLEFT expression PRIGHT SEMIC
-rule 122 while_statement: WHILE push_cont_jump validateLogicexp statement_block
-rule 123 push_cont_jump: 
-rule 124 validateLogicexp: expression
-rule 125 literal_expression: CTED
-rule 126 literal_expression: CTEN
-rule 127 literal_expression: CTESTRING
+rule 121 do_statement: DO push_cont_jump statement_block WHILE validateDoWhileExp SEMIC
+rule 122 validateDoWhileExp: expression
+rule 123 while_statement: WHILE push_cont_jump validateLogicexp statement_block
+rule 124 push_cont_jump: 
+rule 125 validateLogicexp: expression
+rule 126 literal_expression: CTED
+rule 127 literal_expression: CTEN
+rule 128 literal_expression: CTESTRING
 
 ------- Symbols -------
 
@@ -218,7 +219,7 @@ rule 127 literal_expression: CTESTRING
     on right: 27
     on left : 28
   expression (87)
-    on right: 28 39 59 75 82 86 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 109 112 115 118 121 124
+    on right: 28 39 59 75 82 86 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 109 112 115 118 122 125
     on left : 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
   variable_assignment (88)
     on right: 85
@@ -254,7 +255,7 @@ rule 127 literal_expression: CTESTRING
     on right: 49 63
     on left : 61
   statement_block (99)
-    on right: 50 115 117 118 120 121 122
+    on right: 50 115 117 118 120 121 123
     on left : 64
   parameter (100)
     on right: 61
@@ -306,10 +307,10 @@ rule 127 literal_expression: CTESTRING
     on left : 121
   while_statement (116)
     on right: 90
-    on left : 122
+    on left : 123
   literal_expression (117)
     on right: 110
-    on left : 125 126 127
+    on left : 126 127 128
   arglist1 (118)
     on right: 112
     on left : 113 114
@@ -320,11 +321,14 @@ rule 127 literal_expression: CTESTRING
     on right: 118
     on left : 119 120
   push_cont_jump (121)
-    on right: 122
-    on left : 123
-  validateLogicexp (122)
-    on right: 122
+    on right: 121 123
     on left : 124
+  validateDoWhileExp (122)
+    on right: 121
+    on left : 122
+  validateLogicexp (123)
+    on right: 123
+    on left : 125
 
 **Terminals, with rules where they appear
 
@@ -367,8 +371,8 @@ rule 127 literal_expression: CTESTRING
   COMA (36) 24 63 114
   SBLEFT (37) 28 39 75 82
   SBRIGHT (38) 28 39 75 82
-  PLEFT (39) 42 60 74 86 109 115 118 121
-  PRIGHT (40) 42 60 74 86 109 115 118 121
+  PLEFT (39) 42 60 74 86 109
+  PRIGHT (40) 42 60 74 86 109
   FUNK (41) 43
   CHIEF (42) 47
   LOGIC (43) 52
@@ -389,10 +393,10 @@ rule 127 literal_expression: CTESTRING
   ELSE (58) 117 120
   IF (59) 118
   DO (60) 121
-  WHILE (61) 121 122
-  CTED (62) 125
-  CTEN (63) 126
-  CTESTRING (64) 127
+  WHILE (61) 121 123
+  CTED (62) 126
+  CTEN (63) 127
+  CTESTRING (64) 128
 
 --------- State ---------
 
@@ -1007,23 +1011,23 @@ state 67
 
 state 68
 
- 125) literal_expression : CTED _
-
-  $default      reduce using rule 125 (literal_expression)
-
-
-state 69
-
- 126) literal_expression : CTEN _
+ 126) literal_expression : CTED _
 
   $default      reduce using rule 126 (literal_expression)
 
 
-state 70
+state 69
 
- 127) literal_expression : CTESTRING _
+ 127) literal_expression : CTEN _
 
   $default      reduce using rule 127 (literal_expression)
+
+
+state 70
+
+ 128) literal_expression : CTESTRING _
+
+  $default      reduce using rule 128 (literal_expression)
 
 
 state 71
@@ -2376,31 +2380,57 @@ state 149
 
 state 150
 
- 115) unless_statement : UNLESS _ PLEFT expression PRIGHT statement_block unless_statement1
+ 115) unless_statement : UNLESS _ expression statement_block unless_statement1
 
-  PLEFT         shift, and go to state 164
+  NOT           shift, and go to state 63
+  ID            shift, and go to state 60
+  PLEFT         shift, and go to state 66
+  NULL          shift, and go to state 58
+  ITSELF        shift, and go to state 59
+  TRUE          shift, and go to state 64
+  FALSE         shift, and go to state 65
+  CTED          shift, and go to state 68
+  CTEN          shift, and go to state 69
+  CTESTRING     shift, and go to state 70
 
+  reference_expression2  go to state 61
+  reference_expression  go to state 62
+  expression    go to state 164
+  literal_expression  go to state 67
 
 state 151
 
- 118) if_statement : IF _ PLEFT expression PRIGHT statement_block if_statement1
+ 118) if_statement : IF _ expression statement_block if_statement1
 
-  PLEFT         shift, and go to state 165
+  NOT           shift, and go to state 63
+  ID            shift, and go to state 60
+  PLEFT         shift, and go to state 66
+  NULL          shift, and go to state 58
+  ITSELF        shift, and go to state 59
+  TRUE          shift, and go to state 64
+  FALSE         shift, and go to state 65
+  CTED          shift, and go to state 68
+  CTEN          shift, and go to state 69
+  CTESTRING     shift, and go to state 70
 
+  reference_expression2  go to state 61
+  reference_expression  go to state 62
+  expression    go to state 165
+  literal_expression  go to state 67
 
 state 152
 
- 121) do_statement : DO _ statement_block WHILE PLEFT expression PRIGHT SEMIC
+ 121) do_statement : DO _ push_cont_jump statement_block WHILE validateDoWhileExp SEMIC
 
-  BLEFT         shift, and go to state 131
+  $default      reduce using rule 124 (push_cont_jump)
 
-  statement_block  go to state 166
+  push_cont_jump  go to state 166
 
 state 153
 
- 122) while_statement : WHILE _ push_cont_jump validateLogicexp statement_block
+ 123) while_statement : WHILE _ push_cont_jump validateLogicexp statement_block
 
-  $default      reduce using rule 123 (push_cont_jump)
+  $default      reduce using rule 124 (push_cont_jump)
 
   push_cont_jump  go to state 167
 
@@ -2550,54 +2580,87 @@ state 163
 
 state 164
 
- 115) unless_statement : UNLESS PLEFT _ expression PRIGHT statement_block unless_statement1
+  92) expression : expression _ SUM expression
+  93) expression : expression _ DIV expression
+  94) expression : expression _ MOD expression
+  95) expression : expression _ PLUS expression
+  96) expression : expression _ MINUS expression
+  97) expression : expression _ MULT expression
+  98) expression : expression _ MTHAN expression
+  99) expression : expression _ LTHAN expression
+ 100) expression : expression _ MEQUAL expression
+ 101) expression : expression _ LEQUAL expression
+ 102) expression : expression _ EQUALITY expression
+ 103) expression : expression _ DIFFERENT expression
+ 105) expression : expression _ AND expression
+ 106) expression : expression _ OR expression
+ 115) unless_statement : UNLESS expression _ statement_block unless_statement1
 
-  NOT           shift, and go to state 63
-  ID            shift, and go to state 60
-  PLEFT         shift, and go to state 66
-  NULL          shift, and go to state 58
-  ITSELF        shift, and go to state 59
-  TRUE          shift, and go to state 64
-  FALSE         shift, and go to state 65
-  CTED          shift, and go to state 68
-  CTEN          shift, and go to state 69
-  CTESTRING     shift, and go to state 70
+  MOD           shift, and go to state 76
+  MULT          shift, and go to state 79
+  DIV           shift, and go to state 75
+  PLUS          shift, and go to state 77
+  MINUS         shift, and go to state 78
+  MTHAN         shift, and go to state 80
+  MEQUAL        shift, and go to state 82
+  LTHAN         shift, and go to state 81
+  LEQUAL        shift, and go to state 83
+  EQUALITY      shift, and go to state 84
+  DIFFERENT     shift, and go to state 85
+  AND           shift, and go to state 86
+  OR            shift, and go to state 87
+  BLEFT         shift, and go to state 131
+  SUM           shift, and go to state 74
 
-  reference_expression2  go to state 61
-  reference_expression  go to state 62
-  expression    go to state 183
-  literal_expression  go to state 67
+  statement_block  go to state 183
 
 state 165
 
- 118) if_statement : IF PLEFT _ expression PRIGHT statement_block if_statement1
+  92) expression : expression _ SUM expression
+  93) expression : expression _ DIV expression
+  94) expression : expression _ MOD expression
+  95) expression : expression _ PLUS expression
+  96) expression : expression _ MINUS expression
+  97) expression : expression _ MULT expression
+  98) expression : expression _ MTHAN expression
+  99) expression : expression _ LTHAN expression
+ 100) expression : expression _ MEQUAL expression
+ 101) expression : expression _ LEQUAL expression
+ 102) expression : expression _ EQUALITY expression
+ 103) expression : expression _ DIFFERENT expression
+ 105) expression : expression _ AND expression
+ 106) expression : expression _ OR expression
+ 118) if_statement : IF expression _ statement_block if_statement1
 
-  NOT           shift, and go to state 63
-  ID            shift, and go to state 60
-  PLEFT         shift, and go to state 66
-  NULL          shift, and go to state 58
-  ITSELF        shift, and go to state 59
-  TRUE          shift, and go to state 64
-  FALSE         shift, and go to state 65
-  CTED          shift, and go to state 68
-  CTEN          shift, and go to state 69
-  CTESTRING     shift, and go to state 70
+  MOD           shift, and go to state 76
+  MULT          shift, and go to state 79
+  DIV           shift, and go to state 75
+  PLUS          shift, and go to state 77
+  MINUS         shift, and go to state 78
+  MTHAN         shift, and go to state 80
+  MEQUAL        shift, and go to state 82
+  LTHAN         shift, and go to state 81
+  LEQUAL        shift, and go to state 83
+  EQUALITY      shift, and go to state 84
+  DIFFERENT     shift, and go to state 85
+  AND           shift, and go to state 86
+  OR            shift, and go to state 87
+  BLEFT         shift, and go to state 131
+  SUM           shift, and go to state 74
 
-  reference_expression2  go to state 61
-  reference_expression  go to state 62
-  expression    go to state 184
-  literal_expression  go to state 67
+  statement_block  go to state 184
 
 state 166
 
- 121) do_statement : DO statement_block _ WHILE PLEFT expression PRIGHT SEMIC
+ 121) do_statement : DO push_cont_jump _ statement_block WHILE validateDoWhileExp SEMIC
 
-  WHILE         shift, and go to state 185
+  BLEFT         shift, and go to state 131
 
+  statement_block  go to state 185
 
 state 167
 
- 122) while_statement : WHILE push_cont_jump _ validateLogicexp statement_block
+ 123) while_statement : WHILE push_cont_jump _ validateLogicexp statement_block
 
   NOT           shift, and go to state 63
   ID            shift, and go to state 60
@@ -2899,79 +2962,27 @@ state 182
 
 state 183
 
-  92) expression : expression _ SUM expression
-  93) expression : expression _ DIV expression
-  94) expression : expression _ MOD expression
-  95) expression : expression _ PLUS expression
-  96) expression : expression _ MINUS expression
-  97) expression : expression _ MULT expression
-  98) expression : expression _ MTHAN expression
-  99) expression : expression _ LTHAN expression
- 100) expression : expression _ MEQUAL expression
- 101) expression : expression _ LEQUAL expression
- 102) expression : expression _ EQUALITY expression
- 103) expression : expression _ DIFFERENT expression
- 105) expression : expression _ AND expression
- 106) expression : expression _ OR expression
- 115) unless_statement : UNLESS PLEFT expression _ PRIGHT statement_block unless_statement1
+ 115) unless_statement : UNLESS expression statement_block _ unless_statement1
 
-  MOD           shift, and go to state 76
-  MULT          shift, and go to state 79
-  DIV           shift, and go to state 75
-  PLUS          shift, and go to state 77
-  MINUS         shift, and go to state 78
-  MTHAN         shift, and go to state 80
-  MEQUAL        shift, and go to state 82
-  LTHAN         shift, and go to state 81
-  LEQUAL        shift, and go to state 83
-  EQUALITY      shift, and go to state 84
-  DIFFERENT     shift, and go to state 85
-  AND           shift, and go to state 86
-  OR            shift, and go to state 87
-  PRIGHT        shift, and go to state 200
-  SUM           shift, and go to state 74
+  ELSE          shift, and go to state 201
+  $default      reduce using rule 116 (unless_statement1)
 
+  unless_statement1  go to state 200
 
 state 184
 
-  92) expression : expression _ SUM expression
-  93) expression : expression _ DIV expression
-  94) expression : expression _ MOD expression
-  95) expression : expression _ PLUS expression
-  96) expression : expression _ MINUS expression
-  97) expression : expression _ MULT expression
-  98) expression : expression _ MTHAN expression
-  99) expression : expression _ LTHAN expression
- 100) expression : expression _ MEQUAL expression
- 101) expression : expression _ LEQUAL expression
- 102) expression : expression _ EQUALITY expression
- 103) expression : expression _ DIFFERENT expression
- 105) expression : expression _ AND expression
- 106) expression : expression _ OR expression
- 118) if_statement : IF PLEFT expression _ PRIGHT statement_block if_statement1
+ 118) if_statement : IF expression statement_block _ if_statement1
 
-  MOD           shift, and go to state 76
-  MULT          shift, and go to state 79
-  DIV           shift, and go to state 75
-  PLUS          shift, and go to state 77
-  MINUS         shift, and go to state 78
-  MTHAN         shift, and go to state 80
-  MEQUAL        shift, and go to state 82
-  LTHAN         shift, and go to state 81
-  LEQUAL        shift, and go to state 83
-  EQUALITY      shift, and go to state 84
-  DIFFERENT     shift, and go to state 85
-  AND           shift, and go to state 86
-  OR            shift, and go to state 87
-  PRIGHT        shift, and go to state 201
-  SUM           shift, and go to state 74
+  ELSE          shift, and go to state 203
+  $default      reduce using rule 119 (if_statement1)
 
+  if_statement1  go to state 202
 
 state 185
 
- 121) do_statement : DO statement_block WHILE _ PLEFT expression PRIGHT SEMIC
+ 121) do_statement : DO push_cont_jump statement_block _ WHILE validateDoWhileExp SEMIC
 
-  PLEFT         shift, and go to state 202
+  WHILE         shift, and go to state 204
 
 
 state 186
@@ -2990,7 +3001,7 @@ state 186
  103) expression : expression _ DIFFERENT expression
  105) expression : expression _ AND expression
  106) expression : expression _ OR expression
- 124) validateLogicexp : expression _
+ 125) validateLogicexp : expression _
 
   MOD           shift, and go to state 76
   MULT          shift, and go to state 79
@@ -3006,16 +3017,16 @@ state 186
   AND           shift, and go to state 86
   OR            shift, and go to state 87
   SUM           shift, and go to state 74
-  $default      reduce using rule 124 (validateLogicexp)
+  $default      reduce using rule 125 (validateLogicexp)
 
 
 state 187
 
- 122) while_statement : WHILE push_cont_jump validateLogicexp _ statement_block
+ 123) while_statement : WHILE push_cont_jump validateLogicexp _ statement_block
 
   BLEFT         shift, and go to state 131
 
-  statement_block  go to state 203
+  statement_block  go to state 205
 
 state 188
 
@@ -3063,7 +3074,7 @@ state 190
 
   60) variable_value : HEAR _ PLEFT PRIGHT
 
-  PLEFT         shift, and go to state 204
+  PLEFT         shift, and go to state 206
 
 
 state 191
@@ -3123,35 +3134,49 @@ state 198
   SBLEFT        [reduce using rule 40 (variable_assignment5)]
   $default      reduce using rule 40 (variable_assignment5)
 
-  variable_assignment5  go to state 205
+  variable_assignment5  go to state 207
   variable_assignment4  go to state 179
 
 state 199
 
   86) statement : SAY PLEFT expression PRIGHT _ SEMIC
 
-  SEMIC         shift, and go to state 206
+  SEMIC         shift, and go to state 208
 
 
 state 200
 
- 115) unless_statement : UNLESS PLEFT expression PRIGHT _ statement_block unless_statement1
+ 115) unless_statement : UNLESS expression statement_block unless_statement1 _
 
-  BLEFT         shift, and go to state 131
+  $default      reduce using rule 115 (unless_statement)
 
-  statement_block  go to state 207
 
 state 201
 
- 118) if_statement : IF PLEFT expression PRIGHT _ statement_block if_statement1
+ 117) unless_statement1 : ELSE _ statement_block
 
   BLEFT         shift, and go to state 131
 
-  statement_block  go to state 208
+  statement_block  go to state 209
 
 state 202
 
- 121) do_statement : DO statement_block WHILE PLEFT _ expression PRIGHT SEMIC
+ 118) if_statement : IF expression statement_block if_statement1 _
+
+  $default      reduce using rule 118 (if_statement)
+
+
+state 203
+
+ 120) if_statement1 : ELSE _ statement_block
+
+  BLEFT         shift, and go to state 131
+
+  statement_block  go to state 210
+
+state 204
+
+ 121) do_statement : DO push_cont_jump statement_block WHILE _ validateDoWhileExp SEMIC
 
   NOT           shift, and go to state 63
   ID            shift, and go to state 60
@@ -3166,56 +3191,53 @@ state 202
 
   reference_expression2  go to state 61
   reference_expression  go to state 62
-  expression    go to state 209
+  expression    go to state 211
   literal_expression  go to state 67
+  validateDoWhileExp  go to state 212
 
-state 203
+state 205
 
- 122) while_statement : WHILE push_cont_jump validateLogicexp statement_block _
+ 123) while_statement : WHILE push_cont_jump validateLogicexp statement_block _
 
-  $default      reduce using rule 122 (while_statement)
+  $default      reduce using rule 123 (while_statement)
 
 
-state 204
+state 206
 
   60) variable_value : HEAR PLEFT _ PRIGHT
 
-  PRIGHT        shift, and go to state 210
+  PRIGHT        shift, and go to state 213
 
 
-state 205
+state 207
 
   39) variable_assignment4 : SBLEFT expression SBRIGHT variable_assignment5 _
 
   $default      reduce using rule 39 (variable_assignment4)
 
 
-state 206
+state 208
 
   86) statement : SAY PLEFT expression PRIGHT SEMIC _
 
   $default      reduce using rule 86 (statement)
 
 
-state 207
-
- 115) unless_statement : UNLESS PLEFT expression PRIGHT statement_block _ unless_statement1
-
-  ELSE          shift, and go to state 212
-  $default      reduce using rule 116 (unless_statement1)
-
-  unless_statement1  go to state 211
-
-state 208
-
- 118) if_statement : IF PLEFT expression PRIGHT statement_block _ if_statement1
-
-  ELSE          shift, and go to state 214
-  $default      reduce using rule 119 (if_statement1)
-
-  if_statement1  go to state 213
-
 state 209
+
+ 117) unless_statement1 : ELSE statement_block _
+
+  $default      reduce using rule 117 (unless_statement1)
+
+
+state 210
+
+ 120) if_statement1 : ELSE statement_block _
+
+  $default      reduce using rule 120 (if_statement1)
+
+
+state 211
 
   92) expression : expression _ SUM expression
   93) expression : expression _ DIV expression
@@ -3231,7 +3253,7 @@ state 209
  103) expression : expression _ DIFFERENT expression
  105) expression : expression _ AND expression
  106) expression : expression _ OR expression
- 121) do_statement : DO statement_block WHILE PLEFT expression _ PRIGHT SEMIC
+ 122) validateDoWhileExp : expression _
 
   MOD           shift, and go to state 76
   MULT          shift, and go to state 79
@@ -3246,71 +3268,27 @@ state 209
   DIFFERENT     shift, and go to state 85
   AND           shift, and go to state 86
   OR            shift, and go to state 87
-  PRIGHT        shift, and go to state 215
   SUM           shift, and go to state 74
+  $default      reduce using rule 122 (validateDoWhileExp)
 
 
-state 210
+state 212
+
+ 121) do_statement : DO push_cont_jump statement_block WHILE validateDoWhileExp _ SEMIC
+
+  SEMIC         shift, and go to state 214
+
+
+state 213
 
   60) variable_value : HEAR PLEFT PRIGHT _
 
   $default      reduce using rule 60 (variable_value)
 
 
-state 211
-
- 115) unless_statement : UNLESS PLEFT expression PRIGHT statement_block unless_statement1 _
-
-  $default      reduce using rule 115 (unless_statement)
-
-
-state 212
-
- 117) unless_statement1 : ELSE _ statement_block
-
-  BLEFT         shift, and go to state 131
-
-  statement_block  go to state 216
-
-state 213
-
- 118) if_statement : IF PLEFT expression PRIGHT statement_block if_statement1 _
-
-  $default      reduce using rule 118 (if_statement)
-
-
 state 214
 
- 120) if_statement1 : ELSE _ statement_block
-
-  BLEFT         shift, and go to state 131
-
-  statement_block  go to state 217
-
-state 215
-
- 121) do_statement : DO statement_block WHILE PLEFT expression PRIGHT _ SEMIC
-
-  SEMIC         shift, and go to state 218
-
-
-state 216
-
- 117) unless_statement1 : ELSE statement_block _
-
-  $default      reduce using rule 117 (unless_statement1)
-
-
-state 217
-
- 120) if_statement1 : ELSE statement_block _
-
-  $default      reduce using rule 120 (if_statement1)
-
-
-state 218
-
- 121) do_statement : DO statement_block WHILE PLEFT expression PRIGHT SEMIC _
+ 121) do_statement : DO push_cont_jump statement_block WHILE validateDoWhileExp SEMIC _
 
   $default      reduce using rule 121 (do_statement)
 
