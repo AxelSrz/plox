@@ -232,14 +232,15 @@ rule
     | ELSE statement_block                                  {}
 
   if_statement:
-    IF expression statement_block if_statement1  {}
+    IF push_if_floor validateLogicexp statement_block if_statement1  { endIf() }
 
   if_statement1:
     /* empty */                                       {}
-    | ELSE statement_block                                  {}
+    | ELSIF generateElseCode validateLogicexp statement_block if_statement1      {}
+    | ELSE generateElseCode statement_block                      {}
 
   do_statement:
-    DO push_cont_jump statement_block WHILE validateDoWhileExp SEMIC  {}
+    DO push_cont_jump statement_block WHILE validateDoWhileExp  {}
 
   validateDoWhileExp:
     expression                                          { generateDoWhileQuadruple(val[0]) }
@@ -250,8 +251,14 @@ rule
   push_cont_jump:
     /* empty */                                       { $jumpStack.push($quadrupleVector.count()) }
 
+  push_if_floor:
+    /* empty */                                       { $jumpStack.push("if") }
+
   validateLogicexp:
     expression                                        { generateLogicControlQuadruple(val[0], false) }
+
+  generateElseCode:
+    /* empty */                                       { generateElse() }
 
   literal_expression:
     CTED                                              { val[0][1] = newConstant(val[0][0], val[0][1]) }
@@ -790,12 +797,12 @@ end
     $jumpStack.push($quadrupleVector.count()-1)
   end
 
-  def generateDoWhileQuadruple(exp, goToType)
+  def generateDoWhileQuadruple(exp)
     unless exp[0] == "logic"
       abort("Semantic error: type mismatch. Control expression is not logic type. Error on line: #{$line_number}")
     end
     retorno = $jumpStack.pop()
-    quadruple = ["gotoF", exp[1], nil, retorno]
+    quadruple = ["gotoV", exp[1], nil, retorno]
     $quadrupleVector.push(quadruple)
   end
 
@@ -803,5 +810,23 @@ end
     aux = $jumpStack.pop(2)
     quadruple = ["goto", nil, nil, aux[0]]
     $quadrupleVector.push(quadruple)
-    $quadrupleVector[aux[1]][3] = $quadrupleVector.count()
+    fillQuadruple(aux[1])
+  end
+
+  def endIf()
+    while $jumpStack.last() != "if" do
+      fillQuadruple($jumpStack.pop())
+    end
+    $jumpStack.pop()
+  end
+
+  def generateElse()
+    quadruple = ["goto", nil, nil, nil]
+    $quadrupleVector.push(quadruple)
+    fillQuadruple($jumpStack.pop())
+    $jumpStack.push($quadrupleVector.count()-1)
+  end
+
+  def fillQuadruple(index)
+    $quadrupleVector[index][3] = $quadrupleVector.count()
   end

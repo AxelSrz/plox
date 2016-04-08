@@ -1,15 +1,23 @@
 habemvs species Control {
   var hidden number a;
-  var open number b, c;
+  var open number b, c, d;
 
   funk oblivion chief(){
-    a = 50;
-    while( a > b || true ){
-      b = a + c;
-      while(a + b > 1){
-        b = c;
+    while(a+b*c < d){
+      if(a+b < c){
+        a = b + c;
+        do{
+          a = a-1;
+        }while(a > b+c)
+      }
+      else{
+        while(b > c+d){
+          a = b+c*d;
+          b = a-d;
+        }
       }
     }
-    say( a - c / 4 );
+    a= b*c;
+    c= 0;
   }
 }

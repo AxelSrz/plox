@@ -4,12 +4,24 @@ habemvs species EjemploObjectivePlox {
 
     funk open oblivion chief() {
         a = 50;
-        while ( a > b || true ) {
+        if ( a > b || true ) {
             b = a + c;
             while (a + b > 1) {
                 b = c;
             }
         }
-        say(a - c / 4);
+        elsif(a+b < c){
+          a = b + c;
+          do{
+            a = a-1;
+          }while(a > b+c)
+        }
+        elsif(b == c){
+          say(a - c / 4);
+        }
+        else{
+          a = a-1;
+        }
+        a = 50;
     }
 }

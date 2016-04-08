@@ -16,6 +16,7 @@ rule
                            elsif text == "null" then return [:NULL, {0 => text}]
                            elsif text == "if" then return [:IF, {0 => text}]
                            elsif text == "else" then return [:ELSE, {0 => text}]
+                           elsif text == "elsif" then return [:ELSIF, {0 => text}]
                            elsif text == "while" then return [:WHILE, {0 => text}]
                            elsif text == "do" then return [:DO, {0 => text}]
                            elsif text == "unless" then return [:UNLESS, {0 => text}]
