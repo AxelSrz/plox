@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $constantBook; ap $quadrupleVector}
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector}
 
   plox_generation:
     /* empty */                                       {}
@@ -101,7 +101,7 @@ rule
     | variable_assignment4                            {}
 
   method_declaration:
-    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4          {}
+    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk() }
 
   new_function_code:
     FUNK { $actualModifier = true }
@@ -112,7 +112,7 @@ rule
 
   method_declaration2:
     ID                                                { newMethod(val[0][0]) }
-    | CHIEF                                           { newMethod("chief")}
+    | CHIEF                                           { newMethod("chief"); fillQuadruple(0) }
 
   method_declaration3:
     /* empty */                                       {}
@@ -177,14 +177,7 @@ rule
 
   parameter1:
     /* empty */                                       {}
-    | parameter2                                      {}
-
-  parameter2:
-    SBLEFT expression SBRIGHT parameter3              {}
-
-  parameter3:
-    /* empty */                                       {}
-    | parameter2                                      {}
+    | SBLEFT SBRIGHT parameter1                       {}
 
   statement:
     variable_assignment SEMIC                         {}
@@ -282,6 +275,8 @@ end
   $operatorStack = Array.new
   $operandStack = Array.new
   $quadrupleVector = Array.new
+  first = ["goto", nil, nil, nil]
+  $quadrupleVector.push(first)
   $constantBook = Hash.new
   $theMagicNumber = 10000
   $magicReference = {
@@ -593,11 +588,10 @@ end
       $speciesBook[species] = Hash.new
       $speciesBook[species]["methods"] = Hash.new
       $speciesBook[species]["variables"] = Hash.new
-      $speciesBook[species]["size"] = 0
+      $speciesBook[species]["size"] = { "number" => 0, "decimal" => 0, "string" => 0, "char" => 0, "logic" => 0 }
       $actualSpecies = species
       $actualMethod = "species"
       resetCounters("global")
-      puts "species #{species} successfully defined"
     else
       abort("Semantic error: species '#{species}' is already defined. Error on line: #{$line_number}")
     end
@@ -606,7 +600,6 @@ end
   def heirSpecies(father)
     if $speciesBook[father] != nil
       $speciesBook[$actualSpecies]["father"] = $speciesBook[father]
-      puts "successful heiring from #{father}"
     else
       abort("Semantic error: '#{father}' father of species '#{$actualSpecies}' is not defined. Error on line: #{$line_number}")
     end
@@ -627,6 +620,7 @@ end
         $speciesBook[$actualSpecies]["variables"][id]["modifiable"] = $isVariable
         if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
           $speciesBook[$actualSpecies]["variables"][id]["location"] = locationGenerator(1, "global", $actualType)
+          $speciesBook[$actualSpecies]["size"][$actualType] += 1
         end
       else
         abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
@@ -641,6 +635,7 @@ end
         $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
         if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
           $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["size"][$actualType] += 1
         end
       else
         abort("Semantic error: variable '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
@@ -674,9 +669,10 @@ end
       $speciesBook[$actualSpecies]["methods"][id] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["type"] = $actualType
       $speciesBook[$actualSpecies]["methods"][id]["scope"] = $actualModifier
-      $speciesBook[$actualSpecies]["methods"][id]["size"] = 0
+      $speciesBook[$actualSpecies]["methods"][id]["size"] = { "number" => 0, "decimal" => 0, "string" => 0, "char" => 0, "logic" => 0 }
       $speciesBook[$actualSpecies]["methods"][id]["variables"] = Hash.new
       $speciesBook[$actualSpecies]["methods"][id]["argumentList"] = []
+      $speciesBook[$actualSpecies]["methods"][id]["begin"] = $quadrupleVector.count()
       $actualMethod = id
       resetCounters("local")
     else
@@ -694,15 +690,17 @@ end
       $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
       if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
         $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"] = locationGenerator(1, "local", $actualType)
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["size"][$actualType] += 1
       end
-      $speciesBook[$actualSpecies]["methods"][$actualMethod]["argumentList"].push(type)
+      arg = { "location" => $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"], "type" => type }
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["argumentList"].push(arg)
     else
       abort("Semantic error: argument '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
     end
   end
 
   def expressionResultType(operator, leftOp, rightOp)
-    puts "Cube call with leftOp: #{leftOp}, rightOp: #{rightOp} and operator: #{operator} on line: #{$line_number}"
+    # puts "Cube call with leftOp: #{leftOp}, rightOp: #{rightOp} and operator: #{operator} on line: #{$line_number}"
     if $semanticCube[leftOp][rightOp][operator] == nil
       abort("Semantic error: type mismatch. Cannot combine type '#{leftOp}' and type '#{rightOp}' with operator '#{operator}'. Error on line: #{$line_number}")
     end
@@ -829,4 +827,12 @@ end
 
   def fillQuadruple(index)
     $quadrupleVector[index][3] = $quadrupleVector.count()
+  end
+
+  def endFunk()
+    if $actualMethod != "chief"
+      $quadrupleVector.push(["return", nil, nil, nil])
+    else
+      $quadrupleVector.push(["terminate", nil, nil, nil])
+    end
   end
