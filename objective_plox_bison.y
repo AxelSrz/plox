@@ -158,15 +158,25 @@ rule
     NULL                                              {}
     | ITSELF                                          {}
     | ID                                              { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
-    | reference_expression2                           {}
+    | ID SBLEFT expression SBRIGHT                    {}
+    | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]}
+    | non_final_id POINT reference_expression5        {}
 
-  reference_expression2:
-    reference_expression reference_expression5        {}
+  non_final_id:
+    ID                                                { $actualIdSpecies = retrieveIdType(val[0][0]) }
+
+  function_call:
+    funk_id start_funk reference_expression6 PRIGHT     { val[0][0] = val[1][0]; val[0][1] = endFunkCall() }
+
+  funk_id:
+    ID                                                { $actualIdFunk = val[0][0] }
+
+  start_funk:
+    PLEFT                                       { val[0][0] = validateFunk() }
 
   reference_expression5:
-    PLEFT reference_expression6 PRIGHT                {}
-    | SBLEFT expression SBRIGHT                       {}
-    | POINT reference_expression                      {}
+    ID                                                {}
+    | ID POINT reference_expression5                  {}
 
   reference_expression6:
     /* empty */                                       {}
@@ -181,7 +191,7 @@ rule
 
   statement:
     variable_assignment SEMIC                         {}
-    | SAY PLEFT expression PRIGHT SEMIC                                {}
+    | SAY PLEFT expression PRIGHT SEMIC               {}
     | unless_statement                                {}
     | if_statement                                    {}
     | do_statement                                    {}
@@ -207,11 +217,14 @@ rule
     | TRUE                                   { val[0][1] = $trueLocation }
     | FALSE                                  { val[0][1] = $falseLocation }
     | PLEFT expression PRIGHT                { val[0][0] = val[1][0]; val[0][1] = val[1][1] }
-    | literal_expression                              {}
-    | reference_expression                            {}
+    | literal_expression                     {}
+    | reference_expression                   {}
 
   arglist:
-    expression arglist1                               {}
+    generate_arg arglist1                               {}
+
+  generate_arg:
+    expression                                       { generateArg(val[0]) }
 
   arglist1:
     /* empty */                                       {}
@@ -570,6 +583,9 @@ end
   $falseLocation = $magicReference["constant"]["logic"] * $theMagicNumber
   $trueLocation = $falseLocation + 1
   $jumpStack = Array.new
+  $actualIdSpecies
+  $actualFunkType
+
 ---- inner
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
@@ -834,5 +850,47 @@ end
       $quadrupleVector.push(["return", nil, nil, nil])
     else
       $quadrupleVector.push(["terminate", nil, nil, nil])
+    end
+  end
+
+  def validateFunk()
+    if $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk] != nil
+      $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["size"].each do |key, value|
+        $quadrupleVector.push(["ERA"+key, value, nil, nil])
+        $argumentCount = 0
+      end
+      return $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["type"]
+    else
+      abort("Semantic error: species #{$actualIdSpecies} have not defined method #{$actualIdFunk}. Error on line: #{$line_number}")
+    end
+  end
+
+  def generateArg(argument)
+    if $argumentCount >= $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"].count()
+      abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
+    end
+    expected = $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"][$argumentCount]["type"]
+    if expected == argument[0]
+      quadruple = ["param", argument[1], nil, $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"][$argumentCount]["location"]]
+      $quadrupleVector.push(quadruple)
+      $argumentCount += 1
+    else
+      abort("Semantic error: argument type mismatch in #{$actualIdFunk}, expected: '#{expected}' actual: '#{argument[0]}'. Error on line: #{$line_number}")
+    end
+  end
+
+  def endFunkCall
+    if $argumentCount == $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"].count()
+      typeDir = $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["type"]
+      if typeDir == "oblivion"
+        typeDir = nil
+      else
+        typeDir = locationGenerator(1, "local", typeDir)
+      end
+      quadruple = ["gosub", $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["begin"], nil, typeDir]
+      $quadrupleVector.push(quadruple)
+      return typeDir
+    else
+      abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
     end
   end
