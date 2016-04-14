@@ -101,7 +101,7 @@ rule
     | variable_assignment4                            {}
 
   method_declaration:
-    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk() }
+    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk([nil, nil]) }
 
   new_function_code:
     FUNK { $actualModifier = true }
@@ -159,11 +159,12 @@ rule
     | ITSELF                                          {}
     | ID                                              { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
     | ID SBLEFT expression SBRIGHT                    {}
-    | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]}
-    | non_final_id POINT reference_expression5        {}
+    | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = nil }
+    | non_final_id POINT reference_expression5        { val[0][0] = val[0][0] + "." + val[2][0]; validateAttribute(val[0][0]); val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]); $actualIdSpecies = nil }
+    | function_call                                   { $actualIdSpecies = nil }
 
   non_final_id:
-    ID                                                { $actualIdSpecies = retrieveIdType(val[0][0]) }
+    ID                                                { $actualIdSpecies = retrieveIdType(val[0][0]); $actualId = val[0][0] }
 
   function_call:
     funk_id start_funk reference_expression6 PRIGHT     { val[0][0] = val[1][0]; val[0][1] = endFunkCall() }
@@ -176,7 +177,7 @@ rule
 
   reference_expression5:
     ID                                                {}
-    | ID POINT reference_expression5                  {}
+    | ID POINT reference_expression5                  { val[0][0] = val[0][0] + "." + val[2][0] }
 
   reference_expression6:
     /* empty */                                       {}
@@ -196,7 +197,10 @@ rule
     | if_statement                                    {}
     | do_statement                                    {}
     | while_statement                                 { endWhile() }
-    | REPLY expression SEMIC                          {}
+    | REPLY expression SEMIC                          { endFunk(val[1]) }
+    | function_call SEMIC                             { $actualIdSpecies = nil; }
+    | non_final_id POINT function_call SEMIC          { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = nil }
+
 
   expression:
     expression SUM expression                { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
@@ -583,8 +587,10 @@ end
   $falseLocation = $magicReference["constant"]["logic"] * $theMagicNumber
   $trueLocation = $falseLocation + 1
   $jumpStack = Array.new
-  $actualIdSpecies
+  $actualIdSpecies = nil
   $actualFunkType
+  $funkGlobalContext
+  $actualId
 
 ---- inner
 
@@ -616,6 +622,7 @@ end
   def heirSpecies(father)
     if $speciesBook[father] != nil
       $speciesBook[$actualSpecies]["father"] = $speciesBook[father]
+      $magicCounter["global"] = $speciesBook[father]["size"].clone
     else
       abort("Semantic error: '#{father}' father of species '#{$actualSpecies}' is not defined. Error on line: #{$line_number}")
     end
@@ -624,12 +631,8 @@ end
   def newVariable(id)
     if $actualMethod == "species"
       unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
-        unless isValidType($actualType)
-          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
-        end
-        if $actualType == $actualSpecies
-          abort("Semantic error: you cannot have recursive species definitions. Error on line: #{$line_number}")
-        end
+        abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}") unless isValidType($actualType)
+        abort("Semantic error: you cannot have recursive species definitions. Error on line: #{$line_number}") if $actualType == $actualSpecies
         $speciesBook[$actualSpecies]["variables"][id] = Hash.new
         $speciesBook[$actualSpecies]["variables"][id]["type"] = $actualType
         $speciesBook[$actualSpecies]["variables"][id]["scope"] = $actualModifier
@@ -637,6 +640,8 @@ end
         if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
           $speciesBook[$actualSpecies]["variables"][id]["location"] = locationGenerator(1, "global", $actualType)
           $speciesBook[$actualSpecies]["size"][$actualType] += 1
+        else
+          createAtributtesRecursively(id, $speciesBook[$actualType])
         end
       else
         abort("Semantic error: variable '#{id}' is already defined. Error on line: #{$line_number}")
@@ -845,33 +850,47 @@ end
     $quadrupleVector[index][3] = $quadrupleVector.count()
   end
 
-  def endFunk()
+  def endFunk(exp)
+    type = $speciesBook[$actualSpecies]["methods"][$actualMethod]["type"]
+    abort("Semantic error: type mismatch in reply expression. Error on line: #{$line_number}") if type != exp[0] && exp[0] != nil
+    abort("Semantic error: oblivion funks cannot have reply. Error on line: #{$line_number}") if type == "oblivion" && exp[0] != nil
     if $actualMethod != "chief"
-      $quadrupleVector.push(["return", nil, nil, nil])
+      $quadrupleVector.push(["return", nil, nil, exp[1]])
     else
-      $quadrupleVector.push(["terminate", nil, nil, nil])
+      $quadrupleVector.push(["terminate", nil, nil, exp[1]])
     end
   end
 
   def validateFunk()
-    if $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk] != nil
-      $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["size"].each do |key, value|
-        $quadrupleVector.push(["ERA"+key, value, nil, nil])
-        $argumentCount = 0
+    $funkGlobalContext = false
+    if $actualIdSpecies == nil
+      $actualIdSpecies = $actualSpecies
+      $funkGlobalContext = true
+    end
+    funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
+    if funkHash != nil
+      if funkHash["scope"] || $funkGlobalContext
+        funkHash["size"].each do |key, value|
+          $quadrupleVector.push(["ERA", key, value, nil])
+          $argumentCount = 0
+        end
+        return funkHash["type"]
+      else
+        abort("Semantic error: method #{$actualIdFunk} is not open. Error on line: #{$line_number}")
       end
-      return $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["type"]
     else
-      abort("Semantic error: species #{$actualIdSpecies} have not defined method #{$actualIdFunk}. Error on line: #{$line_number}")
+      abort("Semantic error: method #{$actualIdFunk} not defined. Error on line: #{$line_number}")
     end
   end
 
   def generateArg(argument)
-    if $argumentCount >= $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"].count()
+    funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
+    if $argumentCount >= funkHash["argumentList"].count()
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
     end
-    expected = $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"][$argumentCount]["type"]
+    expected = funkHash["argumentList"][$argumentCount]["type"]
     if expected == argument[0]
-      quadruple = ["param", argument[1], nil, $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"][$argumentCount]["location"]]
+      quadruple = ["param", argument[1], nil, funkHash["argumentList"][$argumentCount]["location"]]
       $quadrupleVector.push(quadruple)
       $argumentCount += 1
     else
@@ -880,17 +899,62 @@ end
   end
 
   def endFunkCall
-    if $argumentCount == $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["argumentList"].count()
-      typeDir = $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["type"]
+    funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
+    if $argumentCount == funkHash["argumentList"].count()
+      sendAttributes() unless $funkGlobalContext
+      typeDir = funkHash["type"]
       if typeDir == "oblivion"
         typeDir = nil
       else
         typeDir = locationGenerator(1, "local", typeDir)
       end
-      quadruple = ["gosub", $speciesBook[$actualIdSpecies]["methods"][$actualIdFunk]["begin"], nil, typeDir]
+      quadruple = ["gosub", funkHash["begin"], nil, typeDir]
       $quadrupleVector.push(quadruple)
+      $actualIdSpecies = nil
       return typeDir
     else
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
+    end
+  end
+
+  def createAtributtesRecursively(id, speciesHash)
+    createAtributtesRecursively(id, speciesHash["father"]) if speciesHash["father"] != nil
+    auxSpecies = $actualSpecies
+    speciesHash["variables"].each do |key, h|
+      $actualType = h["type"]
+      $actualModifier = h["scope"]
+      $isVariable = h["modifiable"]
+      newVariable(id+"."+key)
+    end
+    $actualSpecies = auxSpecies
+    $actualType = $speciesBook[$actualSpecies]["variables"][id]["type"]
+    $actualModifier = $speciesBook[$actualSpecies]["variables"][id]["scope"]
+    $isVariable = $speciesBook[$actualSpecies]["variables"][id]["modifiable"]
+  end
+
+  def validateAttribute(id)
+    unless $speciesBook[$actualSpecies]["variables"][id]["scope"]
+      attribute = id.split(".").last
+      abort("Semantic error: attribute #{attribute} is not open. Error on line: #{$line_number}")
+    end
+  end
+
+  def sendAttributes()
+    $speciesBook[$actualSpecies]["variables"].each do |key, h|
+      tokens = key.split(".")
+      if tokens[0] == $actualId && tokens.count > 1
+        quadruple = ["SEND_ATTR", $speciesBook[$actualSpecies]["variables"][key]["location"], nil, nil]
+        $quadrupleVector.push(quadruple)
+      end
+    end
+  end
+
+  def speciesHashOfFunkRecursively(species, id)
+    if species["methods"][id] != nil # regresa si la variable ya existe
+      return species["methods"][id]
+    elsif species["father"] == nil  # si la clase no tiene padre
+      return nil
+    else
+      return speciesHashOfFunkRecursively(species["father"], id) # checa para su padre
     end
   end

@@ -7,7 +7,6 @@ habemvs species Persona {
     reply nEdad;
   }
   funk open decimal getEstatura() {
-    reply dEstatura;
   }
   funk open string getPrimerNombre() {
     reply iPrimerNombre;
@@ -30,7 +29,7 @@ habemvs species Persona {
 }
 
 habemvs species Estudiante heirof Persona {
-  var hidden number nMatricula;
+  var open number nMatricula;
   var hidden decimal dPromedio;
 
   funk open number getMatricula() {
@@ -51,6 +50,10 @@ habemvs species EjemploObjectivePlox {
   var Estudiante estEstudiante;
   eternal decimal pi;
 
+  funk hidden decimal getPi() {
+    reply pi;
+  }
+
   funk oblivion chief() {
     var number num1, num2;
     var decimal num3, media;
@@ -58,7 +61,7 @@ habemvs species EjemploObjectivePlox {
 
     num1 = 13;
     num2 = 12;
-    num3 = num1 - estEstudiante.getMatricula() - num3;
+    num3 = num1 - getPi() + estEstudiante.getEdad();
     media = num1 * (num1 + num2) / 3;
 
     say("Introduce el nombre de la clase");
