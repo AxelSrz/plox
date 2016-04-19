@@ -316,6 +316,34 @@ def sayAction()
 
 end
 
+def gotoAction()
+
+end
+
+def gotoTrueAction()
+
+end
+
+def gotoFalseAction()
+
+end
+
+def paramAction()
+
+end
+
+def gosubAction()
+
+end
+
+def sendAttributeAction()
+
+end
+
+def eraAction()
+
+end
+
 $Action = {
   "+" => addition,
   "-" => subtraction,
@@ -340,7 +368,14 @@ $Action = {
   "&&=" => andAssign,
   "%=" => modAssign
   "hear" => hearAction,
-  "say" => sayAction
+  "say" => sayAction,
+  "goto" => gotoAction,
+  "gotoT" => gotoTrueAction,
+  "gotoF" => gotoFalseAction,
+  "param" => paramAction,
+  "gosub" => gosubAction,
+  "SEND_ATTR" => sendAttributeAction,
+  "ERA" => eraAction
 }
 
 class VirtualMachine
