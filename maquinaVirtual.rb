@@ -366,7 +366,7 @@ $Action = {
   "/=" => divisionAssign,
   "||=" => orAssign,
   "&&=" => andAssign,
-  "%=" => modAssign
+  "%=" => modAssign,
   "hear" => hearAction,
   "say" => sayAction,
   "goto" => gotoAction,
