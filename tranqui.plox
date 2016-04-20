@@ -1,0 +1,21 @@
+habemvs species Funciones {
+  var hidden number a, b;
+
+  funk number fibonacci(number n){
+    var number f1, f2, aux, ciclo;
+    f1 = 0;
+    f2 = 1;
+    ciclo = 1;
+    while(ciclo < n){
+      aux = f1 + f2;
+      f1 = f2;
+      f2 = aux;
+      ciclo = ciclo + 1;
+    }
+    reply f2;
+  }
+
+  funk oblivion chief(){
+    say(fibonacci(7));
+  }
+}

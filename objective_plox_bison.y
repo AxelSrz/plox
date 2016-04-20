@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector}
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $quadrupleVector; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}
@@ -134,7 +134,7 @@ rule
 
   variable_value:
     expression                                        {}
-    | HEAR PLEFT PRIGHT                               {}
+    | HEAR PLEFT PRIGHT                               { val[0][1] = -1; $quadrupleVector.push(["hear", nil, nil, -1]) }
 
   parameter_list:
     parameter parameter_list1                         {}
@@ -192,7 +192,7 @@ rule
 
   statement:
     variable_assignment SEMIC                         {}
-    | SAY PLEFT expression PRIGHT SEMIC               {}
+    | SAY PLEFT expression PRIGHT SEMIC               {$quadrupleVector.push(["say", val[2][1], nil, nil])}
     | unless_statement                                {}
     | if_statement                                    {}
     | do_statement                                    {}
@@ -280,6 +280,7 @@ end
 ---- header
 
   require_relative 'lexer'  # Se agrega el lexer al programa de racc.
+  require 'yaml'
   require "awesome_print"
   $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
   $speciesBook = Hash.new{}
@@ -295,6 +296,7 @@ end
   first = ["goto", nil, nil, nil]
   $quadrupleVector.push(first)
   $constantBook = Hash.new
+  $constantCounterBook = Hash.new
   $theMagicNumber = 10000
   $magicReference = {
     "global" => {
@@ -591,6 +593,12 @@ end
   $actualFunkType
   $funkGlobalContext
   $actualId
+  $argumentCount = 0
+  $argumentCountStack = []
+  $funkSpecies
+
+  $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
+  $constantBook[true] = $constantBook[false] + 1
 
 ---- inner
 
@@ -765,11 +773,7 @@ end
     leftOp = retrieveIdLocation(leftOpHash[0])
     leftOpType = retrieveIdType(leftOpHash[0])
     expressionResultType(operator, leftOpType, rightOpHash[0])
-    if rightOpHash[0] == "hear"
-      quadruple = [operator, nil, rightOpHash[0], leftOp]
-    else
-      quadruple = [operator, nil, rightOpHash[1], leftOp]
-    end
+    quadruple = [operator, nil, rightOpHash[1], leftOp]
     $quadrupleVector.push(quadruple)
   end
 
@@ -855,6 +859,7 @@ end
     abort("Semantic error: type mismatch in reply expression. Error on line: #{$line_number}") if type != exp[0] && exp[0] != nil
     abort("Semantic error: oblivion funks cannot have reply. Error on line: #{$line_number}") if type == "oblivion" && exp[0] != nil
     if $actualMethod != "chief"
+      sendAttributesDirectly()
       $quadrupleVector.push(["return", nil, nil, exp[1]])
     else
       $quadrupleVector.push(["terminate", nil, nil, exp[1]])
@@ -862,6 +867,10 @@ end
   end
 
   def validateFunk()
+    if $argumentCount != 0
+      $argumentCountStack.push($argumentCount)
+    end
+    $argumentCount = 0
     $funkGlobalContext = false
     if $actualIdSpecies == nil
       $actualIdSpecies = $actualSpecies
@@ -870,10 +879,6 @@ end
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if funkHash != nil
       if funkHash["scope"] || $funkGlobalContext
-        funkHash["size"].each do |key, value|
-          $quadrupleVector.push(["ERA", key, value, nil])
-          $argumentCount = 0
-        end
         return funkHash["type"]
       else
         abort("Semantic error: method #{$actualIdFunk} is not open. Error on line: #{$line_number}")
@@ -890,7 +895,7 @@ end
     end
     expected = funkHash["argumentList"][$argumentCount]["type"]
     if expected == argument[0]
-      quadruple = ["param", argument[1], nil, funkHash["argumentList"][$argumentCount]["location"]]
+      quadruple = ["param", argument[1], [($argumentCount+1), funkHash["argumentList"].count], funkHash["argumentList"][$argumentCount]["location"]]
       $quadrupleVector.push(quadruple)
       $argumentCount += 1
     else
@@ -901,7 +906,11 @@ end
   def endFunkCall
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if $argumentCount == funkHash["argumentList"].count()
-      sendAttributes() unless $funkGlobalContext
+      if $funkGlobalContext
+        sendAttributesDirectly()
+      else
+        sendAttributes()
+      end
       typeDir = funkHash["type"]
       if typeDir == "oblivion"
         typeDir = nil
@@ -911,6 +920,11 @@ end
       quadruple = ["gosub", funkHash["begin"], nil, typeDir]
       $quadrupleVector.push(quadruple)
       $actualIdSpecies = nil
+      if $argumentCountStack.empty?
+        $argumentCount = 0
+      else
+        $argumentCount = $argumentCountStack.pop
+      end
       return typeDir
     else
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
@@ -942,8 +956,21 @@ end
   def sendAttributes()
     $speciesBook[$actualSpecies]["variables"].each do |key, h|
       tokens = key.split(".")
-      if tokens[0] == $actualId && tokens.count > 1
-        quadruple = ["SEND_ATTR", $speciesBook[$actualSpecies]["variables"][key]["location"], nil, nil]
+      type = h["type"]
+      isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+      if tokens[0] == $actualId && tokens.count > 1 && isPrimitive
+        quadruple = ["SEND_ATTR", h["location"], nil, nil]
+        $quadrupleVector.push(quadruple)
+      end
+    end
+  end
+
+  def sendAttributesDirectly()
+    $speciesBook[$actualSpecies]["variables"].each do |key, h|
+      type = h["type"]
+      isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+      if isPrimitive
+        quadruple = ["SEND_ATTR", h["location"], nil, nil]
         $quadrupleVector.push(quadruple)
       end
     end
@@ -957,4 +984,12 @@ end
     else
       return speciesHashOfFunkRecursively(species["father"], id) # checa para su padre
     end
+  end
+
+  def terminateCompilation()
+    $constantBook.each do |key, value|
+      $constantCounterBook[value] = key
+    end
+    File.open('constants.yaml', 'w') { |fo| fo.puts $constantCounterBook.to_yaml }
+    File.open('quadruples.yaml', 'w') { |fo| fo.puts $quadrupleVector.to_yaml }
   end

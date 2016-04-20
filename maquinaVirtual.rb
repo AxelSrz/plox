@@ -1,10 +1,10 @@
-require_relative 'objective_plox_bison.y'
+require_relative 'parser'
 
 # Variable that saves the content of the current Quadruple
 $currentQuadruple = Array.new
 $memoryManager = $speciesBook
 $memory
-$quadrupleManager = $quadrupleVector
+$quadrupleManager =
 
 # Variable that saves the number of the current Quadruple
 $quadrupleCounter = 0
@@ -378,22 +378,20 @@ $Action = {
   "ERA" => eraAction
 }
 
-class VirtualMachine
-  def executeQuadruple(quadruple)
-    $currentQuadruple = quadruple
+def executeQuadruple(quadruple)
+  $currentQuadruple = quadruple
 
-    # Retrieval of the action to execute in the switch
-    quadrupleAction = quadruple[0]
+  # Retrieval of the action to execute in the switch
+  quadrupleAction = quadruple[0]
 
-    return $Action[quadrupleAction]
+  return $Action[quadrupleAction]
 
-  end
+end
 
-  def execution()
-    puts "Executing program...";
-    while $quadrupleCounter < $quadrupleManager.count() do
-      executeQuadruple($quadrupleManager[$quadrupleCounter])
-      $quadrupleCounter += 1
-    end
+def execution()
+  puts "Executing program...";
+  while $quadrupleCounter < $quadrupleManager.count() do
+    executeQuadruple($quadrupleManager[$quadrupleCounter])
+    $quadrupleCounter += 1
   end
 end

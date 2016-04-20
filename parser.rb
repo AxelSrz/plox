@@ -8,6 +8,7 @@ require 'racc/parser.rb'
 
 
   require_relative 'lexer'  # Se agrega el lexer al programa de racc.
+  require 'yaml'
   require "awesome_print"
   $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
   $speciesBook = Hash.new{}
@@ -23,6 +24,7 @@ require 'racc/parser.rb'
   first = ["goto", nil, nil, nil]
   $quadrupleVector.push(first)
   $constantBook = Hash.new
+  $constantCounterBook = Hash.new
   $theMagicNumber = 10000
   $magicReference = {
     "global" => {
@@ -319,10 +321,16 @@ require 'racc/parser.rb'
   $actualFunkType
   $funkGlobalContext
   $actualId
+  $argumentCount = 0
+  $argumentCountStack = []
+  $funkSpecies
+
+  $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
+  $constantBook[true] = $constantBook[false] + 1
 
 class ObjectivePlox < Racc::Parser
 
-module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 596)
+module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 604)
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
   # Funcion que lee un archivo como entrada.
@@ -495,11 +503,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     leftOp = retrieveIdLocation(leftOpHash[0])
     leftOpType = retrieveIdType(leftOpHash[0])
     expressionResultType(operator, leftOpType, rightOpHash[0])
-    if rightOpHash[0] == "hear"
-      quadruple = [operator, nil, rightOpHash[0], leftOp]
-    else
-      quadruple = [operator, nil, rightOpHash[1], leftOp]
-    end
+    quadruple = [operator, nil, rightOpHash[1], leftOp]
     $quadrupleVector.push(quadruple)
   end
 
@@ -585,6 +589,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     abort("Semantic error: type mismatch in reply expression. Error on line: #{$line_number}") if type != exp[0] && exp[0] != nil
     abort("Semantic error: oblivion funks cannot have reply. Error on line: #{$line_number}") if type == "oblivion" && exp[0] != nil
     if $actualMethod != "chief"
+      sendAttributesDirectly()
       $quadrupleVector.push(["return", nil, nil, exp[1]])
     else
       $quadrupleVector.push(["terminate", nil, nil, exp[1]])
@@ -592,6 +597,10 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def validateFunk()
+    if $argumentCount != 0
+      $argumentCountStack.push($argumentCount)
+    end
+    $argumentCount = 0
     $funkGlobalContext = false
     if $actualIdSpecies == nil
       $actualIdSpecies = $actualSpecies
@@ -600,10 +609,6 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if funkHash != nil
       if funkHash["scope"] || $funkGlobalContext
-        funkHash["size"].each do |key, value|
-          $quadrupleVector.push(["ERA", key, value, nil])
-          $argumentCount = 0
-        end
         return funkHash["type"]
       else
         abort("Semantic error: method #{$actualIdFunk} is not open. Error on line: #{$line_number}")
@@ -620,7 +625,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     end
     expected = funkHash["argumentList"][$argumentCount]["type"]
     if expected == argument[0]
-      quadruple = ["param", argument[1], nil, funkHash["argumentList"][$argumentCount]["location"]]
+      quadruple = ["param", argument[1], [($argumentCount+1), funkHash["argumentList"].count], funkHash["argumentList"][$argumentCount]["location"]]
       $quadrupleVector.push(quadruple)
       $argumentCount += 1
     else
@@ -631,7 +636,11 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   def endFunkCall
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if $argumentCount == funkHash["argumentList"].count()
-      sendAttributes() unless $funkGlobalContext
+      if $funkGlobalContext
+        sendAttributesDirectly()
+      else
+        sendAttributes()
+      end
       typeDir = funkHash["type"]
       if typeDir == "oblivion"
         typeDir = nil
@@ -641,6 +650,11 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
       quadruple = ["gosub", funkHash["begin"], nil, typeDir]
       $quadrupleVector.push(quadruple)
       $actualIdSpecies = nil
+      if $argumentCountStack.empty?
+        $argumentCount = 0
+      else
+        $argumentCount = $argumentCountStack.pop
+      end
       return typeDir
     else
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
@@ -672,8 +686,21 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   def sendAttributes()
     $speciesBook[$actualSpecies]["variables"].each do |key, h|
       tokens = key.split(".")
-      if tokens[0] == $actualId && tokens.count > 1
-        quadruple = ["SEND_ATTR", $speciesBook[$actualSpecies]["variables"][key]["location"], nil, nil]
+      type = h["type"]
+      isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+      if tokens[0] == $actualId && tokens.count > 1 && isPrimitive
+        quadruple = ["SEND_ATTR", h["location"], nil, nil]
+        $quadrupleVector.push(quadruple)
+      end
+    end
+  end
+
+  def sendAttributesDirectly()
+    $speciesBook[$actualSpecies]["variables"].each do |key, h|
+      type = h["type"]
+      isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+      if isPrimitive
+        quadruple = ["SEND_ATTR", h["location"], nil, nil]
         $quadrupleVector.push(quadruple)
       end
     end
@@ -687,6 +714,14 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
     else
       return speciesHashOfFunkRecursively(species["father"], id) # checa para su padre
     end
+  end
+
+  def terminateCompilation()
+    $constantBook.each do |key, value|
+      $constantCounterBook[value] = key
+    end
+    File.open('constants.yaml', 'w') { |fo| fo.puts $constantCounterBook.to_yaml }
+    File.open('quadruples.yaml', 'w') { |fo| fo.puts $quadrupleVector.to_yaml }
   end
 ...end objective_plox_bison.y/module_eval...
 ##### State transition tables begin ###
@@ -1375,7 +1410,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 14)
   def _reduce_1(val, _values, result)
-     puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector
+     puts "OP! Programa compilado exitosamente."; ap $quadrupleVector; terminateCompilation() 
     result
   end
 .,.,
@@ -1788,7 +1823,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 135)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 136)
   def _reduce_60(val, _values, result)
-    
+     val[0][1] = -1; $quadrupleVector.push(["hear", nil, nil, -1]) 
     result
   end
 .,.,
@@ -1984,7 +2019,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 193)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 194)
   def _reduce_88(val, _values, result)
-    
+    $quadrupleVector.push(["say", val[2][1], nil, nil])
     result
   end
 .,.,

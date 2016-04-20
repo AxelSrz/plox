@@ -61,6 +61,7 @@ habemvs species EjemploObjectivePlox {
 
     num1 = 13;
     num2 = 12;
+    estEstudiante.setEdad(13);
     num3 = num1 - getPi() + estEstudiante.getEdad();
     media = num1 * (num1 + num2) / 3;
 
