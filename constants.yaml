@@ -3,4 +3,7 @@
 190001: true
 150000: 0
 150001: 1
-150002: 7
+150002: 2
+170000: Ingresa un numero
+170001: 'Fibonacci iterativo:'
+170002: 'Fibonacci recursivo:'

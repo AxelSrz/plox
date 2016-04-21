@@ -47,8 +47,8 @@ habemvs species Estudiante heirof Persona {
 }
 
 habemvs species EjemploObjectivePlox {
-  var Estudiante estEstudiante;
   eternal decimal pi;
+  var Estudiante estEstudiante;
 
   funk hidden decimal getPi() {
     reply pi;

@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $quadrupleVector; terminateCompilation() }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}
@@ -78,14 +78,14 @@ rule
     SBLEFT expression SBRIGHT type1           {}
 
   variable_assignment:
-    ID variable_assignment1 EQUAL variable_value          { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 PLUSASSIGN variable_value   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MINUSASSIGN variable_value  { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MULTASSIGN variable_value   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 DIVASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 ORASSIGN variable_value     { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 ANDASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MODASSIGN variable_value    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    ID variable_assignment1 EQUAL expression          { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 PLUSASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MINUSASSIGN expression  { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MULTASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 DIVASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 ORASSIGN expression     { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 ANDASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID variable_assignment1 MODASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
 
 
   variable_assignment1:
@@ -131,10 +131,6 @@ rule
     | ID                                              { $actualType = val[0][0] }
     | OBLIVION                                        { $actualType = "oblivion" }
     | STRING                                          { $actualType = "string" }
-
-  variable_value:
-    expression                                        {}
-    | HEAR PLEFT PRIGHT                               { val[0][1] = -1; $quadrupleVector.push(["hear", nil, nil, -1]) }
 
   parameter_list:
     parameter parameter_list1                         {}
@@ -193,6 +189,7 @@ rule
   statement:
     variable_assignment SEMIC                         {}
     | SAY PLEFT expression PRIGHT SEMIC               {$quadrupleVector.push(["say", val[2][1], nil, nil])}
+    | HEAR PLEFT reference_expression PRIGHT SEMIC    {$quadrupleVector.push(["hear", val[2][0], nil, val[2][1]]) }
     | unless_statement                                {}
     | if_statement                                    {}
     | do_statement                                    {}
@@ -790,8 +787,8 @@ end
   def retrieveIdLocation(id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
       return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"]
-    elsif $speciesBook[$actualSpecies]["variables"][id] != nil
-      return $speciesBook[$actualSpecies]["variables"][id]["location"]
+    elsif idLocationRecursively($speciesBook[$actualSpecies], id) != nil
+      return idLocationRecursively($speciesBook[$actualSpecies], id)
     else
       abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
     end
@@ -800,8 +797,8 @@ end
   def retrieveIdType(id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
       return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"]
-    elsif $speciesBook[$actualSpecies]["variables"][id] != nil
-      return $speciesBook[$actualSpecies]["variables"][id]["type"]
+    elsif idTypeRecursively($speciesBook[$actualSpecies], id) != nil
+      return idTypeRecursively($speciesBook[$actualSpecies], id)
     else
       abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
     end
@@ -859,7 +856,6 @@ end
     abort("Semantic error: type mismatch in reply expression. Error on line: #{$line_number}") if type != exp[0] && exp[0] != nil
     abort("Semantic error: oblivion funks cannot have reply. Error on line: #{$line_number}") if type == "oblivion" && exp[0] != nil
     if $actualMethod != "chief"
-      sendAttributesDirectly()
       $quadrupleVector.push(["return", nil, nil, exp[1]])
     else
       $quadrupleVector.push(["terminate", nil, nil, exp[1]])
@@ -959,19 +955,28 @@ end
       type = h["type"]
       isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
       if tokens[0] == $actualId && tokens.count > 1 && isPrimitive
-        quadruple = ["SEND_ATTR", h["location"], nil, nil]
+        destination = idLocationRecursively($speciesBook[$speciesBook[$actualSpecies]["variables"][tokens[0]]["type"]], key[key.index(".")+1..-1])
+        quadruple = ["SEND_ATTR", destination, nil, h["location"]]
         $quadrupleVector.push(quadruple)
       end
     end
   end
 
   def sendAttributesDirectly()
-    $speciesBook[$actualSpecies]["variables"].each do |key, h|
-      type = h["type"]
-      isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
-      if isPrimitive
-        quadruple = ["SEND_ATTR", h["location"], nil, nil]
-        $quadrupleVector.push(quadruple)
+    iterateClassVariablesRecursively($speciesBook[$actualSpecies])
+  end
+
+  def iterateClassVariablesRecursively(speciesHash)
+    if speciesHash["father"] != nil
+      iterateClassVariablesRecursively(speciesHash["father"])
+    else
+      speciesHash["variables"].each do |key, h|
+        type = h["type"]
+        isPrimitive = type == "number" || type == "decimal" || type == "char" || type == "string" || type == "logic"
+        if isPrimitive
+          quadruple = ["SEND_ATTR", h["location"], nil, h["location"]]
+          $quadrupleVector.push(quadruple)
+        end
       end
     end
   end
@@ -983,6 +988,26 @@ end
       return nil
     else
       return speciesHashOfFunkRecursively(species["father"], id) # checa para su padre
+    end
+  end
+
+  def idLocationRecursively(species, id)
+    if species["variables"][id] != nil # regresa si la variable ya existe
+      return species["variables"][id]["location"]
+    elsif species["father"] == nil  # si la clase no tiene padre
+      return nil
+    else
+      return idLocationRecursively(species["father"], id) # checa para su padre
+    end
+  end
+
+  def idTypeRecursively(species, id)
+    if species["variables"][id] != nil # regresa si la variable ya existe
+      return species["variables"][id]["type"]
+    elsif species["father"] == nil  # si la clase no tiene padre
+      return nil
+    else
+      return idLocationRecursively(species["father"], id) # checa para su padre
     end
   end
 

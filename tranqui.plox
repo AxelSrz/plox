@@ -1,6 +1,4 @@
-habemvs species Funciones {
-  var hidden number a, b;
-
+habemvs species Funciones{
   funk number fibonacci(number n){
     var number f1, f2, aux, ciclo;
     f1 = 0;
@@ -15,7 +13,25 @@ habemvs species Funciones {
     reply f2;
   }
 
+  funk number fibboRecursivo(number n){
+    if(n < 2){
+      reply n;
+    }
+    else{
+      reply fibboRecursivo(n-1) + fibboRecursivo(n-2);
+    }
+  }
+}
+
+habemvs species Tranqui {
   funk oblivion chief(){
-    say(fibonacci(7));
+    var Funciones prueba;
+    var number input;
+    say("Ingresa un numero");
+    hear(input);
+    say("Fibonacci iterativo:");
+    say(prueba.fibonacci(input));
+    say("Fibonacci recursivo:");
+    say(prueba.fibboRecursivo(input));
   }
 }
