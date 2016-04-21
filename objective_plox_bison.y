@@ -155,7 +155,7 @@ rule
     | ITSELF                                          {}
     | ID                                              { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
     | ID SBLEFT expression SBRIGHT                    {}
-    | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = nil }
+    | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last }
     | non_final_id POINT reference_expression5        { val[0][0] = val[0][0] + "." + val[2][0]; validateAttribute(val[0][0]); val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]); $actualIdSpecies = nil }
     | function_call                                   { $actualIdSpecies = nil }
 
@@ -195,7 +195,7 @@ rule
     | do_statement                                    {}
     | while_statement                                 { endWhile() }
     | REPLY expression SEMIC                          { endFunk(val[1]) }
-    | function_call SEMIC                             { $actualIdSpecies = nil; }
+    | function_call SEMIC                             { $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last }
     | non_final_id POINT function_call SEMIC          { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = nil }
 
 
@@ -593,6 +593,8 @@ end
   $argumentCount = 0
   $argumentCountStack = []
   $funkSpecies
+  $speciesStack = Array.new
+  $idStack = Array.new
 
   $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
   $constantBook[true] = $constantBook[false] + 1
@@ -688,7 +690,7 @@ end
   end
 
   def newMethod(id)
-    unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "methods")
+    unless $speciesBook[$actualSpecies]["methods"][id] != nil
       unless isValidType($actualType) || $actualType == "oblivion"
         abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
       end
@@ -872,6 +874,8 @@ end
       $actualIdSpecies = $actualSpecies
       $funkGlobalContext = true
     end
+    $speciesStack.push($actualIdSpecies)
+    $idStack.push($actualIdFunk)
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if funkHash != nil
       if funkHash["scope"] || $funkGlobalContext
@@ -915,7 +919,8 @@ end
       end
       quadruple = ["gosub", funkHash["begin"], nil, typeDir]
       $quadrupleVector.push(quadruple)
-      $actualIdSpecies = nil
+      $speciesStack.pop
+      $idStack.pop
       if $argumentCountStack.empty?
         $argumentCount = 0
       else

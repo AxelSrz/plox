@@ -324,13 +324,15 @@ require 'racc/parser.rb'
   $argumentCount = 0
   $argumentCountStack = []
   $funkSpecies
+  $speciesStack = Array.new
+  $idStack = Array.new
 
   $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
   $constantBook[true] = $constantBook[false] + 1
 
 class ObjectivePlox < Racc::Parser
 
-module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 601)
+module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 603)
 
   # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
   # Funcion que lee un archivo como entrada.
@@ -421,7 +423,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def newMethod(id)
-    unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "methods")
+    unless $speciesBook[$actualSpecies]["methods"][id] != nil
       unless isValidType($actualType) || $actualType == "oblivion"
         abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
       end
@@ -605,6 +607,8 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
       $actualIdSpecies = $actualSpecies
       $funkGlobalContext = true
     end
+    $speciesStack.push($actualIdSpecies)
+    $idStack.push($actualIdFunk)
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if funkHash != nil
       if funkHash["scope"] || $funkGlobalContext
@@ -618,6 +622,8 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def generateArg(argument)
+    puts $actualIdSpecies
+    puts $actualIdFunk
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if $argumentCount >= funkHash["argumentList"].count()
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
@@ -648,7 +654,8 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
       end
       quadruple = ["gosub", funkHash["begin"], nil, typeDir]
       $quadrupleVector.push(quadruple)
-      $actualIdSpecies = nil
+      $speciesStack.pop
+      $idStack.pop
       if $argumentCountStack.empty?
         $argumentCount = 0
       else
@@ -1958,7 +1965,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 156)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 157)
   def _reduce_71(val, _values, result)
-     val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = nil 
+     val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last 
     result
   end
 .,.,
@@ -2112,7 +2119,7 @@ module_eval(<<'.,.,', 'objective_plox_bison.y', 196)
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 197)
   def _reduce_93(val, _values, result)
-     $actualIdSpecies = nil; 
+     $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last 
     result
   end
 .,.,

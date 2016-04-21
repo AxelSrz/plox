@@ -10,15 +10,18 @@ habemvs species Funciones{
       f2 = aux;
       ciclo = ciclo + 1;
     }
+    say("Fibonacci iterativo:");
     reply f2;
   }
+}
 
-  funk number fibboRecursivo(number n){
+habemvs species FuncionesRecursivas heirof Funciones{
+  funk number fibonacci(number n){
     if(n < 2){
       reply n;
     }
     else{
-      reply fibboRecursivo(n-1) + fibboRecursivo(n-2);
+      reply fibonacci(n-1) + fibonacci(n-2);
     }
   }
 }
@@ -26,12 +29,13 @@ habemvs species Funciones{
 habemvs species Tranqui {
   funk oblivion chief(){
     var Funciones prueba;
+    var FuncionesRecursivas pruebaRecursiva;
     var number input;
     say("Ingresa un numero");
     hear(input);
-    say("Fibonacci iterativo:");
-    say(prueba.fibonacci(input));
+    say(prueba.fibonacci(prueba.fibonacci(input)));
     say("Fibonacci recursivo:");
-    say(prueba.fibboRecursivo(input));
+    say(pruebaRecursiva.fibonacci(input));
+    say("OP");
   }
 }
