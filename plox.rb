@@ -529,7 +529,7 @@ class VirtualMachine
 end
 
 prueba = ObjectivePlox.new
-puts "Ingrese el nombre del archivo a parsear junto con su extension: "
+puts "Ingrese el nombre del archivo a compilar: "
 STDOUT.flush
 nombre = gets.chomp
 prueba.parse(nombre)

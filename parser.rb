@@ -622,8 +622,6 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def generateArg(argument)
-    puts $actualIdSpecies
-    puts $actualIdFunk
     funkHash = speciesHashOfFunkRecursively($speciesBook[$actualIdSpecies], $actualIdFunk)
     if $argumentCount >= funkHash["argumentList"].count()
       abort("Semantic error: wrong number of arguments for function #{$actualIdFunk}. Error on line: #{$line_number}")
