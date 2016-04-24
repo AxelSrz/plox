@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; terminateCompilation() }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}
@@ -47,7 +47,7 @@ rule
     | HIDDEN                                          { $actualModifier = false }
 
   variable_declaration:
-    variable_is_modifiable variable_scope type some_variables SEMIC            {}
+    variable_is_modifiable variable_scope type_specifier some_variables SEMIC            {}
 
   variable_scope:
     /* empty */                                       {}
@@ -61,47 +61,55 @@ rule
     code_new_variable next_variable                   {}
 
   code_new_variable:
+    new_var_id array_dec                              {}
+
+  new_var_id:
     ID  { newVariable(val[0][0]) }
 
   next_variable:
     /* empty */                                       {}
-    | COMA some_variables                      {}
+    | COMA some_variables                             {}
 
-  type:
-    type_specifier type1                              {}
-
-  type1:
+  array_dec:
     /* empty */                                       {}
-    | type2                                           {}
+    | start_array bounds array_dec2 SBRIGHT           { defineArray() }
 
-  type2:
-    SBLEFT expression SBRIGHT type1           {}
+  start_array:
+    SBLEFT                                            { newArray() }
+
+  array_dec2:
+    /* empty */                                       {}
+    | COMA bounds array_dec2                          {}
+
+  bounds:
+   CTEN POINT POINT CTEN  { newDimension(val[0], val[3]) }
 
   variable_assignment:
-    ID variable_assignment1 EQUAL expression          { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 PLUSASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MINUSASSIGN expression  { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MULTASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 DIVASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 ORASSIGN expression     { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 ANDASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID variable_assignment1 MODASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    ID array_call EQUAL expression          { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call PLUSASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call MINUSASSIGN expression  { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call MULTASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call DIVASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call ORASSIGN expression     { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call ANDASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | ID array_call MODASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
 
-
-  variable_assignment1:
+  array_call:
     /* empty */                                       {}
-    | variable_assignment4 variable_assignment5       {}
+    | start_array_call array_index array_call2 SBRIGHT    {}
 
+  start_array_call:
+    SBLEFT                                            {}
 
-  variable_assignment4:
-    SBLEFT expression SBRIGHT variable_assignment5      {}
-
-  variable_assignment5:
+  array_call2:
     /* empty */                                       {}
-    | variable_assignment4                            {}
+    | COMA array_index array_call2                    {}
+
+  array_index:
+   expression  {}
 
   method_declaration:
-    new_function_code method_declaration1 type method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk([nil, nil]) }
+    new_function_code method_declaration1 type_specifier method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk([nil, nil]) }
 
   new_function_code:
     FUNK { $actualModifier = true }
@@ -153,11 +161,13 @@ rule
   reference_expression:
     NULL                                              {}
     | ITSELF                                          {}
-    | ID                                              { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
-    | ID SBLEFT expression SBRIGHT                    {}
+    | id_refernce array_call                          {}
     | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last }
     | non_final_id POINT reference_expression5        { val[0][0] = val[0][0] + "." + val[2][0]; validateAttribute(val[0][0]); val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]); $actualIdSpecies = nil }
     | function_call                                   { $actualIdSpecies = nil }
+
+  id_refernce:
+    ID                                                { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
 
   non_final_id:
     ID                                                { $actualIdSpecies = retrieveIdType(val[0][0]); $actualId = val[0][0] }
@@ -180,11 +190,7 @@ rule
     | arglist                                         {}
 
   parameter:
-    type ID parameter1                                { newArgument(val[0][0], val[1][0]) }
-
-  parameter1:
-    /* empty */                                       {}
-    | SBLEFT SBRIGHT parameter1                       {}
+    type_specifier ID                                 { newArgument(val[0][0], val[1][0]) }
 
   statement:
     variable_assignment SEMIC                         {}
@@ -595,6 +601,7 @@ end
   $funkSpecies
   $speciesStack = Array.new
   $idStack = Array.new
+  $actualVarId
 
   $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
   $constantBook[true] = $constantBook[false] + 1
@@ -667,6 +674,70 @@ end
         end
       else
         abort("Semantic error: variable '#{id}' is already defined in method '#{$actualMethod}'. Error on line: #{$line_number}")
+      end
+    end
+    $actualVarId = id
+  end
+
+  def newArray()
+    if $actualMethod == "species"
+      if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+        $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"] = Array.new
+      else
+        abort("Semantic error: ObjectivePlox currently doesnt support arrays of objects. Error on line: #{$line_number}")
+      end
+    else
+      if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
+        $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"] = Array.new
+      else
+        abort("Semantic error: ObjectivePlox currently doesnt support arrays of objects. Error on line: #{$line_number}")
+      end
+    end
+  end
+
+  def newDimension(infLi, supLi)
+    dimension = Hash.new
+    dimension["sl"] = supLi[1]
+    dimension["il"] = infLi[1]
+    dimension["r"] = supLi[1] - infLi[1] + 1
+    if $actualMethod == "species"
+      dimension["r"] *= $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].last["r"] if $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].last != nil
+      $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].push(dimension)
+    else
+      dimension["r"] *= $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].last["r"] if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].last != nil
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].push(dimension)
+    end
+  end
+
+  def defineArray()
+    suma = 0
+    if $actualMethod == "species"
+      r = $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].last["r"]
+      $speciesBook[$actualSpecies]["variables"][$actualVarId]["totalsize"] = r
+      locationGenerator(r-1, "global", $actualType)
+      $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].each_with_index do |h, i|
+        m = r / (h["sl"] - h["il"] + 1)
+        r = m
+        suma += (h["il"] * m)
+        if i == $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"].count - 1
+          $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"][i]["k"] = - suma
+        else
+          $speciesBook[$actualSpecies]["variables"][$actualVarId]["dimensions"][i]["m"] = m
+        end
+      end
+    else
+      r = $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].last["r"]
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["totalsize"] = r
+      locationGenerator(r-1, "local", $actualType)
+      $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].each_with_index do |h, i|
+        m = r / (h["sl"] - h["il"] + 1)
+        r = m
+        suma += (h["il"] * m)
+        if i == $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].count - 1
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"][i]["k"] = - suma
+        else
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"][i]["m"] = suma
+        end
       end
     end
   end

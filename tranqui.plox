@@ -1,4 +1,5 @@
 habemvs species Funciones{
+  var number arr[2..4,0..2,1..6], resultado;
   funk number fibonacci(number n){
     var number f1, f2, aux, ciclo;
     f1 = 0;
