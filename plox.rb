@@ -66,15 +66,22 @@ class VirtualMachine
   end
 
   def obtainData(dir)
-    @memory[@contextPointer][dir]
+    if (dir.is_a?(Integer))
+      return @memory[@contextPointer][dir]
+    else
+      return @memory[@contextPointer][@memory[@contextPointer][dir.to_i]]
+    end
   end
 
   def store(dir, value)
-    @memory[@contextPointer][dir] = value
+    if (dir.is_a?(Integer))
+      @memory[@contextPointer][dir] = value
+    else
+      @memory[@contextPointer][@memory[@contextPointer][dir.to_i]] = value
+    end
   end
 
   def addition()
-
     op1 = @quadrupleVector[@quadruplePointer][1]
     op2 = @quadrupleVector[@quadruplePointer][2]
     res = @quadrupleVector[@quadruplePointer][3]
@@ -83,7 +90,6 @@ class VirtualMachine
     temp = obtainData(op1) + obtainData(op2)
     # Store the temporary variable in @memory
     store(res, temp)
-
   end
 
   def subtraction()
@@ -358,6 +364,33 @@ class VirtualMachine
 
   end
 
+  def addSpecialRight
+    op1 = @quadrupleVector[@quadruplePointer][1]
+    op2 = @quadrupleVector[@quadruplePointer][2]
+    res = @quadrupleVector[@quadruplePointer][3]
+
+    # Get the value for op1 and op2 and store them in a temporary variable
+    temp = obtainData(op1) + op2
+    # Store the temporary variable in @memory
+    store(res, temp)
+  end
+
+  def multSpecialRight
+    op1 = @quadrupleVector[@quadruplePointer][1]
+    op2 = @quadrupleVector[@quadruplePointer][2]
+    res = @quadrupleVector[@quadruplePointer][3]
+
+    # Get the value for op1 and op2 and store them in a temporary variable
+    temp = obtainData(op1) * op2
+    # Store the temporary variable in @memory
+    store(res, temp)
+  end
+
+  def verify
+    num = obtainData(@quadrupleVector[@quadruplePointer][3])
+    abort("Execution error: out of bounds.") unless num <= @quadrupleVector[@quadruplePointer][1] && num >= @quadrupleVector[@quadruplePointer][2]
+  end
+
   def hearAction()
 
     res = @quadrupleVector[@quadruplePointer][3]
@@ -494,6 +527,12 @@ class VirtualMachine
       andAssign
     when "%="
       modAssign
+    when "+SpecialRight"
+      addSpecialRight
+    when "*SpecialRight"
+      multSpecialRight
+    when "verify"
+      verify
     when "hear"
       hearAction
     when "say"

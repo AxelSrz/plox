@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; terminateCompilation() }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}
@@ -85,28 +85,30 @@ rule
    CTEN POINT POINT CTEN  { newDimension(val[0], val[3]) }
 
   variable_assignment:
-    ID array_call EQUAL expression          { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call PLUSASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call MINUSASSIGN expression  { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call MULTASSIGN expression   { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call DIVASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call ORASSIGN expression     { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call ANDASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | ID array_call MODASSIGN expression    { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    id_reference necesario EQUAL expression                     { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario PLUSASSIGN expression              { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario MINUSASSIGN expression             { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario MULTASSIGN expression              { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario DIVASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario ORASSIGN expression                { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario ANDASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
+    | id_reference necesario MODASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
+
+  necesario:
+    /* empty */                                       {}
 
   array_call:
-    /* empty */                                       {}
-    | start_array_call array_index array_call2 SBRIGHT    {}
+    start_array_call array_index array_call2 SBRIGHT    { val[0][1] = endArrayAccess() }
 
   start_array_call:
-    SBLEFT                                            {}
+    SBLEFT                                            { startArrayIndex() }
 
   array_call2:
     /* empty */                                       {}
     | COMA array_index array_call2                    {}
 
   array_index:
-   expression  {}
+   expression                                         { newDimensionIndex(val[0]) }
 
   method_declaration:
     new_function_code method_declaration1 type_specifier method_declaration2 PLEFT method_declaration3 PRIGHT method_declaration4    { endFunk([nil, nil]) }
@@ -161,13 +163,17 @@ rule
   reference_expression:
     NULL                                              {}
     | ITSELF                                          {}
-    | id_refernce array_call                          {}
+    | id_reference                                    {}
     | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last }
     | non_final_id POINT reference_expression5        { val[0][0] = val[0][0] + "." + val[2][0]; validateAttribute(val[0][0]); val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]); $actualIdSpecies = nil }
     | function_call                                   { $actualIdSpecies = nil }
 
-  id_refernce:
-    ID                                                { val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
+  id_reference:
+    base_id                                           {}
+    | base_id array_call                              { val[0][1] = val[1][1] }
+
+  base_id:
+    ID                                                { $actualId = val[0][0]; val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]) }
 
   non_final_id:
     ID                                                { $actualIdSpecies = retrieveIdType(val[0][0]); $actualId = val[0][0] }
@@ -602,6 +608,7 @@ end
   $speciesStack = Array.new
   $idStack = Array.new
   $actualVarId
+  $arrayIndexStack = Array.new
 
   $constantBook[false] = $magicReference["constant"]["logic"] * $theMagicNumber
   $constantBook[true] = $constantBook[false] + 1
@@ -662,9 +669,7 @@ end
       end
     else
       if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
-        unless isValidType($actualType)
-          abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}")
-        end
+        abort("Semantic error: species '#{$actualType}' is not defined. Error on line: #{$line_number}") unless isValidType($actualType)
         $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] = Hash.new
         $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"] = $actualType
         $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["modifiable"] = $isVariable
@@ -736,7 +741,7 @@ end
         if i == $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"].count - 1
           $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"][i]["k"] = - suma
         else
-          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"][i]["m"] = suma
+          $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][$actualVarId]["dimensions"][i]["m"] = m
         end
       end
     end
@@ -839,11 +844,8 @@ end
   end
 
   def createAssignQuadruple(operator, leftOpHash, rightOpHash)
-    # puts "Assign Q leftOp: #{leftOpHash}, rightOp: #{rightOpHash} and operator: #{operator} on line: #{$line_number}"
-    leftOp = retrieveIdLocation(leftOpHash[0])
-    leftOpType = retrieveIdType(leftOpHash[0])
-    expressionResultType(operator, leftOpType, rightOpHash[0])
-    quadruple = [operator, nil, rightOpHash[1], leftOp]
+    expressionResultType(operator, leftOpHash[0], rightOpHash[0])
+    quadruple = [operator, nil, rightOpHash[1], leftOpHash[1]]
     $quadrupleVector.push(quadruple)
   end
 
@@ -874,6 +876,16 @@ end
       return idTypeRecursively($speciesBook[$actualSpecies], id)
     else
       abort("Semantic error: variable '#{id}' not declared. Error on line: #{$line_number}")
+    end
+  end
+
+  def retrieveIdDimensions(id)
+    if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
+      return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["dimensions"]
+    elsif idDimensionsRecursively($speciesBook[$actualSpecies], id) != nil
+      return idDimensionsRecursively($speciesBook[$actualSpecies], id)
+    else
+      abort("Semantic error: dimensioned variable '#{id}' not declared. Error on line: #{$line_number}")
     end
   end
 
@@ -1034,6 +1046,12 @@ end
         destination = idLocationRecursively($speciesBook[$speciesBook[$actualSpecies]["variables"][tokens[0]]["type"]], key[key.index(".")+1..-1])
         quadruple = ["SEND_ATTR", destination, nil, h["location"]]
         $quadrupleVector.push(quadruple)
+        if h["totalsize"] != nil
+          for index in 1..h["totalsize"]-1
+            quadruple = ["SEND_ATTR", destination, nil, h["location"]+index]
+            $quadrupleVector.push(quadruple)
+          end
+        end
       end
     end
   end
@@ -1052,6 +1070,12 @@ end
         if isPrimitive
           quadruple = ["SEND_ATTR", h["location"], nil, h["location"]]
           $quadrupleVector.push(quadruple)
+          if h["totalsize"] != nil
+            for index in 1..h["totalsize"]-1
+              quadruple = ["SEND_ATTR", h["location"]+index, nil, h["location"]+index]
+              $quadrupleVector.push(quadruple)
+            end
+          end
         end
       end
     end
@@ -1083,8 +1107,67 @@ end
     elsif species["father"] == nil  # si la clase no tiene padre
       return nil
     else
-      return idLocationRecursively(species["father"], id) # checa para su padre
+      return idTypeRecursively(species["father"], id) # checa para su padre
     end
+  end
+
+  def idDimensionsRecursively(species, id)
+    if species["variables"][id] != nil # regresa si la variable ya existe
+      return species["variables"][id]["dimensions"]
+    elsif species["father"] == nil  # si la clase no tiene padre
+      return nil
+    else
+      return idDimensionsRecursively(species["father"], id) # checa para su padre
+    end
+  end
+
+  def startArrayIndex()
+    dim = retrieveIdDimensions($actualId)
+    if dim != nil
+      arrIndex = Hash.new
+      arrIndex["dimensions"] = dim
+      arrIndex["location"] = retrieveIdLocation($actualId)
+      arrIndex["index"] = -1
+      $arrayIndexStack.push(arrIndex)
+    end
+  end
+
+  def newDimensionIndex(index)
+    abort("Semantic error: you can only use numbers to refer a dimension index. Error on line: #{$line_number}") unless index[0] == "number"
+    $arrayIndexStack.last["index"] += 1
+    abort("Semantic error: wrong nunmber of dimensions, the variable you're accessing has less dimensions. Error on line: #{$line_number}") unless $arrayIndexStack.last["index"] < $arrayIndexStack.last["dimensions"].count
+    sl = $arrayIndexStack.last["dimensions"][$arrayIndexStack.last["index"]]["sl"]
+    il = $arrayIndexStack.last["dimensions"][$arrayIndexStack.last["index"]]["il"]
+    $quadrupleVector.push(["verify", sl, il, index[1]])
+    temp = -1
+    if $arrayIndexStack.last["index"] != $arrayIndexStack.last["dimensions"].count - 1
+      temp = locationGenerator(1,"temporal","number")
+      $quadrupleVector.push(["*SpecialRight", index[1], $arrayIndexStack.last["dimensions"][$arrayIndexStack.last["index"]]["m"], temp])
+      if $arrayIndexStack.last["index"] > 0
+        aux = temp
+        temp = locationGenerator(1,"temporal","number")
+        $quadrupleVector.push(["+", aux, $arrayIndexStack.last["temporal"], temp])
+        $arrayIndexStack.last["temporal"] = temp
+      end
+    elsif $arrayIndexStack.last["index"] > 0
+      temp = locationGenerator(1,"temporal","number")
+      $quadrupleVector.push(["+", index[1], $arrayIndexStack.last["temporal"], temp])
+      $arrayIndexStack.last["temporal"] = temp
+    else
+      temp = index[1]
+    end
+    $arrayIndexStack.last["temporal"] = temp
+  end
+
+  def endArrayAccess()
+     abort("Semantic error: wrong nunmber of dimensions, the variable you're accessing has more dimensions. Error on line: #{$line_number}") unless $arrayIndexStack.last["index"] == $arrayIndexStack.last["dimensions"].count - 1
+     temp = locationGenerator(1,"temporal","number")
+     $quadrupleVector.push(["+SpecialRight", $arrayIndexStack.last["temporal"], $arrayIndexStack.last["dimensions"][$arrayIndexStack.last["index"]]["k"], temp])
+     aux = temp
+     temp = locationGenerator(1,"temporal","number")
+     $quadrupleVector.push(["+SpecialRight", aux, $arrayIndexStack.last["location"], temp])
+     $arrayIndexStack.pop
+     return temp.to_f
   end
 
   def terminateCompilation()
