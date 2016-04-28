@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector; terminateCompilation() }
+    plox_generation                                   { puts "OP! Programa compilado exitosamente."; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}
@@ -85,17 +85,14 @@ rule
    CTEN POINT POINT CTEN  { newDimension(val[0], val[3]) }
 
   variable_assignment:
-    id_reference necesario EQUAL expression                     { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario PLUSASSIGN expression              { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario MINUSASSIGN expression             { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario MULTASSIGN expression              { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario DIVASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario ORASSIGN expression                { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario ANDASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
-    | id_reference necesario MODASSIGN expression               { createAssignQuadruple(val[2][0], val[0], val[3]) }
-
-  necesario:
-    /* empty */                                       {}
+    id_reference EQUAL expression                     { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference PLUSASSIGN expression              { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference MINUSASSIGN expression             { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference MULTASSIGN expression              { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference DIVASSIGN expression               { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference ORASSIGN expression                { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference ANDASSIGN expression               { createAssignQuadruple(val[1][0], val[0], val[2]) }
+    | id_reference MODASSIGN expression               { createAssignQuadruple(val[1][0], val[0], val[2]) }
 
   array_call:
     start_array_call array_index array_call2 SBRIGHT    { val[0][1] = endArrayAccess() }
@@ -222,7 +219,8 @@ rule
     | expression LEQUAL expression           { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
     | expression EQUALITY expression         { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
     | expression DIFFERENT expression        { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
-    | NOT expression                         { val[0][1] = createNotQuadruple(val[0]) }
+    | NOT expression                         { val[0][0] = "logic";  val[0][1] = createNotQuadruple(val[1]) }
+    | MINUS expression                       { val[0][0] = "number"; val[0][1] = createNegateExp(val[1]) }
     | expression AND expression              { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
     | expression OR expression               { val[0][0] = expressionResultType(val[1][0], val[0][0], val[2][0]); val[0][1] = createExpressionQuadruple(val[1][0], val[0][1], val[2][1], val[0][0]) }
     | TRUE                                   { val[0][1] = $trueLocation }
@@ -848,13 +846,19 @@ end
   end
 
   def createNotQuadruple(opHash)
-    if opHash[0] == "logic"
-      result = locationGenerator(1, "temporal", "logic")
-      quadruple = ["!", nil, opHash[1], result]
-      return result
-    else
-      abort("Semantic error: type mismatch. Cannot negate non-logic values ('#{opHash[0]}'). Error on line: #{$line_number}")
-    end
+    abort("Semantic error: you cannot negate a non-logic expression with '!'. Error on line: #{$line_number}") unless opHash[0] == "logic"
+    result = locationGenerator(1, "temporal", "logic")
+    quadruple = ["!", nil, opHash[1], result]
+    $quadrupleVector.push(quadruple)
+    return result
+  end
+
+  def createNegateExp(exp)
+    abort("Semantic error: you cannot negate a non-numeric expression with '-'. Error on line: #{$line_number}") unless exp[0] == "number"
+    result = locationGenerator(1, "temporal", "number")
+    quadruple = ["negate", nil, exp[1], result]
+    $quadrupleVector.push(quadruple)
+    return result
   end
 
   def retrieveIdLocation(id)

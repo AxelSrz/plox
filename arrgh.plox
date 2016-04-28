@@ -3,25 +3,21 @@ habemvs species Arrgh {
 
   funk oblivion vamoAOrdenarlo(){
     var number a,b, temp;
-    var logic swapped;
     a = 1;
     b = 1;
     swapped = false;
 
     while(a<=10-1){
-      swapped = false;
       b = 1;
       while(b<=10-a){
         if(arr[b] > arr[b+1]){
           temp = arr[b];
           arr[b] = arr[b+1];
           arr[b+1] = temp;
-
-          swapped = true;
         }
-        b = b + 1;
+        b += 1;
       }
-      a = a + 1;
+      a += 1;
     }
   }
 
@@ -30,7 +26,7 @@ habemvs species Arrgh {
     arr[2] = 7;
     arr[3] = 0;
     arr[4] = 10000;
-    arr[5] = 2;
+    arr[5] = -2;
     arr[6] = 67;
     arr[7] = 21;
     arr[8] = 1;

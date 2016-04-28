@@ -36,8 +36,8 @@ rule
                            elsif text == "string" then return [:STRING, {0 => text}]
                            elsif text == "logic" then return [:LOGIC, {0 => text}]
                            else return [:ID, {0 => text}] end }
-  [0-9]+\.[0-9]+         { [:CTED, {0 => "decimal", 1 => text.to_f}] }
-  [0-9]+                 { [:CTEN, {0 => "number", 1 => text.to_i}] }
+  \d+\.\d+            { [:CTED, {0 => "decimal", 1 => text.to_f}] }
+  \d+                 { [:CTEN, {0 => "number", 1 => text.to_i}] }
   ".*"                   { [:CTESTRING, {0 => "string", 1 => text[1...-1]}] }
   !=                     { [:DIFFERENT, {0 => text}] }
   \|\|=                  { [:ORASSIGN, {0 => text}] }

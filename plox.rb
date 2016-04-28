@@ -234,6 +234,18 @@ class VirtualMachine
 
   end
 
+  def negateExp()
+
+    op1 = @quadrupleVector[@quadruplePointer][2]
+    res = @quadrupleVector[@quadruplePointer][3]
+
+    # Get the value for op1 and op2 and store them in a temporary variable
+    temp = -(obtainData(op1))
+    # Store the temporary variable in @memory
+    store(res, temp)
+
+  end
+
   def andExp()
 
     op1 = @quadrupleVector[@quadruplePointer][1]
@@ -279,7 +291,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = obtainData(op1) + obtainData(op1)
+    temp = obtainData(res) + obtainData(op1)
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -292,7 +304,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = obtainData(op1) - obtainData(op1)
+    temp = obtainData(res) - obtainData(op1)
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -305,7 +317,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = obtainData(op1) * obtainData(op1)
+    temp = obtainData(res) * obtainData(op1)
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -318,7 +330,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = obtainData(op1) / obtainData(op1)
+    temp = obtainData(res) / obtainData(op1)
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -331,7 +343,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = (obtainData(op1) && obtainData(op1))
+    temp = (obtainData(res) && obtainData(op1))
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -344,7 +356,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = (obtainData(op1) || obtainData(op1))
+    temp = (obtainData(res) || obtainData(op1))
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -357,7 +369,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    temp = (obtainData(op1) % obtainData(op1))
+    temp = (obtainData(res) % obtainData(op1))
 
     # Store the value of op1 in the @memory address of res
     store(res, temp)
@@ -527,6 +539,8 @@ class VirtualMachine
       andAssign
     when "%="
       modAssign
+    when "negate"
+      negateExp
     when "+SpecialRight"
       addSpecialRight
     when "*SpecialRight"

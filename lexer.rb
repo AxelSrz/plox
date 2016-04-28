@@ -96,10 +96,10 @@ class ObjectivePlox < Racc::Parser
                            else return [:ID, {0 => text}] end }
 
 
-      when (text = @ss.scan(/[0-9]+\.[0-9]+/))
+      when (text = @ss.scan(/\d+\.\d+/))
          action { [:CTED, {0 => "decimal", 1 => text.to_f}] }
 
-      when (text = @ss.scan(/[0-9]+/))
+      when (text = @ss.scan(/\d+/))
          action { [:CTEN, {0 => "number", 1 => text.to_i}] }
 
       when (text = @ss.scan(/".*"/))

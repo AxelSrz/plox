@@ -9,7 +9,7 @@ habemvs species Funciones{
       aux = f1 + f2;
       f1 = f2;
       f2 = aux;
-      ciclo = ciclo + 1;
+      ciclo += 1;
     }
     say("Fibonacci iterativo:");
     reply f2;
