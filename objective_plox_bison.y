@@ -161,9 +161,7 @@ rule
     | statement statement_block2                      {}
 
   reference_expression:
-    NULL                                              {}
-    | ITSELF                                          {}
-    | id_reference                                    {}
+    id_reference                                    {}
     | non_final_id POINT function_call                { val[0][0] = val[2][0]; val[0][1] = val[2][1]; $actualIdSpecies = $speciesStack.last; $actualIdFunk = $idStack.last }
     | non_final_id POINT reference_expression5        { val[0][0] = val[0][0] + "." + val[2][0]; validateAttribute(val[0][0]); val[0][1] = retrieveIdLocation(val[0][0]); val[0][0] = retrieveIdType(val[0][0]); $actualIdSpecies = nil }
     | function_call                                   { $actualIdSpecies = nil }

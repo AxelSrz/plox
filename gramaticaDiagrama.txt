@@ -2,23 +2,23 @@ plox_generation ::=
  (type_declaration)*
 
 type_declaration  ::=
- "habemvs" class_declaration ";"
+ "habemvs" class_declaration
 
 class_declaration  ::=
  "species" identifier
  (  "heirof" identifier )?
- "{"  (variable_declaration)* ( method_declaration )*  "}"
+ "{"  (variable_declaration)* (method_declaration)*  "}"
 
 modifier ::=
  "open"
  |  "hidden"
 
 variable_declaration  ::=
- ( "var" | "eternal" ) ( modifier )* type identifier
- (  "," identifier  )*  ";"
+ ( "var" | "eternal" ) ( modifier )? type_specifier identifier (array_dec)?
+ (  "," identifier (array_dec)?  )*  ";"
 
-type  ::=
- type_specifier  (  "[" expression "]"  )*
+ array_dec ::=
+ "[" CTEN ".." CTEN ("," CTEN ".." CTEN)* "]"
 
 method_declaration  ::=
 "funk" ( modifier )? type ( identifier | "chief" )
@@ -28,7 +28,7 @@ method_declaration  ::=
 statement_block  ::=  "{" (variable_declaration)* ( statement )*  "}"
 
 variable_assignment  ::=
- identifier  (  "[" expression "]"  )* assign_operator variable_value
+ identifier   (  "[" expression "]"  )* assign_operator expression
 
 assign_operator ::=
   "="
@@ -40,27 +40,23 @@ assign_operator ::=
   | "&&="
   | "%="
 
-variable_value  ::=
-( expression ";" )
- |  ( "hear" "()" ";")
-
 parameter_list  ::=
 parameter  (  "," parameter_list )*
 
 parameter  ::=
-type identifier  ( "[" expression "]"  )*
+type identifier
 
 statement  ::=
-variable_assignment
+variable_assignment ";"
+ |  ( "hear" "(" expression ")" ";")
  |  ( "say" "(" expression ")" ";")
- |  ( expression  ";"  )
- |  ( statement_block )
  |  ( unless_statement )
  |  ( if_statement )
  |  ( do_statement )
  |  ( while_statement )
  |  (  "reply"  ( expression )?  ";"  )
- |  (  ";"  )
+ |  (  function_call ";"  )
+ |  (  identifier "." function_call ";"  )
 
 unless_statement ::=
   "unless"  "(" expression  ")" statement
@@ -88,9 +84,7 @@ expression  ::=
  |  ( reference_expression )
 
 reference_expression ::=
-  "null"
-  |  "itself"
-  |  identifier
+  identifier
   |  reference_expression ( ( "(" ( arglist )? ")" )
   |  ( "[" expression "]" )
   |  ( "." reference_expression )
