@@ -571,7 +571,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def createNotQuadruple(opHash)
-    abort("Semantic error: you cannot negate a non-numeric expression. Error on line: #{$line_number}") unless opHash[0] == "logic"
+    abort("Semantic error: you cannot negate a non-logic expression with '!'. Error on line: #{$line_number}") unless opHash[0] == "logic"
     result = locationGenerator(1, "temporal", "logic")
     quadruple = ["!", nil, opHash[1], result]
     $quadrupleVector.push(quadruple)
@@ -579,7 +579,7 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def createNegateExp(exp)
-    abort("Semantic error: you cannot negate a non-numeric expression. Error on line: #{$line_number}") unless exp[0] == "number"
+    abort("Semantic error: you cannot negate a non-numeric expression with '-'. Error on line: #{$line_number}") unless exp[0] == "number"
     result = locationGenerator(1, "temporal", "number")
     quadruple = ["negate", nil, exp[1], result]
     $quadrupleVector.push(quadruple)
@@ -1579,7 +1579,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 14)
   def _reduce_1(val, _values, result)
-     puts "OP! Programa compilado exitosamente."; ap $speciesBook; ap $quadrupleVector; terminateCompilation() 
+     puts "OP! Programa compilado exitosamente."; terminateCompilation() 
     result
   end
 .,.,

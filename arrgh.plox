@@ -1,11 +1,10 @@
 habemvs species Arrgh {
-  var number arr[1..10];
+  var number arr[1..10], izq[1..3,1..3], der[1..3,1..3], res[1..3,1..3];
 
   funk oblivion vamoAOrdenarlo(){
     var number a,b, temp;
     a = 1;
     b = 1;
-    swapped = false;
 
     while(a<=10-1){
       b = 1;
@@ -21,20 +20,38 @@ habemvs species Arrgh {
     }
   }
 
+  funk oblivion vamoAMultiplicarlo(){
+    var number a,b,c;
+    a = 1;
+    b = 1;
+    c = 1;
+    while(a<=3){
+      while(b<=3){
+        while(c<=3){
+          res[a,c] += (der[a,c]*izq[c,b]);
+          c += 1;
+        }
+        c = 1;
+        b +=1;
+      }
+      b = 1;
+      a += 1;
+    }
+  }
+
   funk oblivion chief(){
-    arr[1] = 3;
-    arr[2] = 7;
-    arr[3] = 0;
-    arr[4] = 10000;
-    arr[5] = -2;
-    arr[6] = 67;
-    arr[7] = 21;
-    arr[8] = 1;
-    arr[9] = 4;
-    arr[10] = 90;
+    var number a,b, temp;
+    a = 1;
+    b = 1;
+    while(a<=10){
+      say("Ingresa el siguiente numero del arreglo a ordenar");
+      hear(arr[a]);
+      a+= 1;
+    }
 
     vamoAOrdenarlo();
 
+    say("Arreglo ordenado:");
     say(arr[1]);
     say(arr[2]);
     say(arr[3]);
@@ -46,5 +63,54 @@ habemvs species Arrgh {
     say(arr[9]);
     say(arr[10]);
 
+    a = 1;
+    b = 1;
+    while(a<=3){
+      b = 1;
+      while(b<=3){
+        say("Ingresa el siguiente numero de la primera matriz a multiplicar");
+        hear(izq[a,b]);
+        b += 1;
+      }
+      a += 1;
+    }
+
+    a = 1;
+    b = 1;
+    while(a<=3){
+      b = 1;
+      while(b<=3){
+        say("Ingresa el siguiente numero de la segunda matriz a multiplicar");
+        hear(der[a,b]);
+        b += 1;
+      }
+      a += 1;
+    }
+
+    a = 1;
+    b = 1;
+    while(a<=3){
+      while(b<=3){
+        res[a,b] = 0;
+        b += 1;
+      }
+      b = 1;
+      a += 1;
+    }
+
+    vamoAMultiplicarlo();
+
+    a = 1;
+    b = 1;
+
+    say("Matriz resultado");
+    while(a<=3){
+      while(b<=3){
+        say(res[a,b]);
+        b += 1;
+      }
+      b = 1;
+      a += 1;
+    }
   }
 }
