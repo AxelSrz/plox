@@ -12,7 +12,7 @@ class ObjectivePlox
   preclow
 rule
   supreme_plox:
-    plox_generation                                   { puts "OP! Programa compilado exitosamente."; terminateCompilation() }
+    plox_generation                                   { puts "OP! Compilation successful."; terminateCompilation() }
 
   plox_generation:
     /* empty */                                       {}

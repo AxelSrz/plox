@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require './parser.rb'
 require 'yaml'
 require "awesome_print"
@@ -408,7 +409,7 @@ class VirtualMachine
     res = @quadrupleVector[@quadruplePointer][3]
 
     # Get the value from op1 and store it in a temporary variable
-    input = gets.chomp
+    input = $stdin.gets.chomp
     if @quadrupleVector[@quadruplePointer][1] == "number"
       temp = input.to_i
     elsif @quadrupleVector[@quadruplePointer][1] == "decimal"
@@ -582,9 +583,6 @@ class VirtualMachine
 end
 
 prueba = ObjectivePlox.new
-puts "Ingrese el nombre del archivo a compilar: "
-STDOUT.flush
-nombre = gets.chomp
-prueba.parse(nombre)
+prueba.parse(ARGV[0])
 vm = VirtualMachine.new
 vm.execution

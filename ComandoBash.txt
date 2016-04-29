@@ -1,0 +1,8 @@
+Convertir un archivo de ruby a shell script (para correrlo como comeando de bash):
+http://stackoverflow.com/questions/28018591/how-do-i-make-a-ruby-script-into-a-bash-command
+
+Como crear un archivo de configuracion para bash:
+http://redfinsolutions.com/blog/creating-bashprofile-your-mac
+
+Modificar tu bash profile para agregar el bin actual como parte del path:
+http://stackoverflow.com/questions/16366986/adding-bin-directory-in-your-path

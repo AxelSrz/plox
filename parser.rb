@@ -1579,7 +1579,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'objective_plox_bison.y', 14)
   def _reduce_1(val, _values, result)
-     puts "OP! Programa compilado exitosamente."; terminateCompilation() 
+     puts "OP! Compilation successful."; terminateCompilation() 
     result
   end
 .,.,
