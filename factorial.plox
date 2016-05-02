@@ -1,0 +1,20 @@
+habemvs species PruebaFactorial () {
+  funk number factorial(number n) {
+    if(n == 0) {
+      reply 1;
+    }
+    else {
+      reply n * factorial(n-1);
+    }
+  }
+  funk oblivion chief() {
+    var number i,j;
+    say("Ingresa el valor de i:");
+    hear(i);
+
+    j = factorial(i);
+
+    say(i);
+
+  }
+}
