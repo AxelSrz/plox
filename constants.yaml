@@ -1,10 +1,8 @@
 ---
 190000: false
 190001: true
-150000: 0
+150000: 5
 150001: 1
-170000: 'Fibonacci iterativo:'
-150002: 2
-170001: Ingresa un numero
-170002: 'Fibonacci recursivo:'
-170003: OP
+150002: 10
+170000: Ingresa el siguiente numero del arreglo
+170001: "¿Que numero quieres buscar?"
