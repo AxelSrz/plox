@@ -1,10 +1,6 @@
 ---
 190000: false
 190001: true
-150000: 0
-150001: 1
-170000: 'Fibonacci iterativo:'
-150002: 2
-170001: Ingresa un numero
-170002: 'Fibonacci recursivo:'
-170003: OP
+170000: Introduce el valor de a
+170001: Introduce el valor de b
+170002: 'El resultado de dividir a entre b es: '
