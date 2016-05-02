@@ -125,6 +125,9 @@ class VirtualMachine
     op2 = @quadrupleVector[@quadruplePointer][2]
     res = @quadrupleVector[@quadruplePointer][3]
 
+    if obtainData(op2) == 0
+      abort("Execution error: cannot have a division by 0.")
+    end
     # Get the value for op1 and op2 and store them in a temporary variable
     temp = obtainData(op1) / obtainData(op2)
     # Store the temporary variable in @memory

@@ -4,24 +4,41 @@ habemvs species EjemploObjectivePlox {
 
     funk open oblivion chief() {
         a = 50;
+        b = 10;
+        c = 35;
+        say("El valor de a es: ");
+        say(a);
         if ( a > b || true ) {
-            b = a + c;
-            while (a + b > 1) {
-                b = c;
-            }
+          say("Estoy en el if");
+          b = a + c;
+          while (a + b > 1) {
+              b += c;
+              c -= 10;
+          }
+          b += a;
+
         }
         elsif(a+b < c){
+          say("Estoy en el primer elsif");
           a = b + c;
           do{
             a = a-1;
           }while(a > b+c)
         }
         elsif(b == c){
+          say("Estoy en el segundo elsif");
           say(a - c / 4);
         }
         else{
+          say("Estoy en el else");
           a = a-1;
         }
         a = 50;
+        say("El valor final de a es: ");
+        say(a);
+        say("El valor final de b es: ");
+        say(b);
+        say("El valor final de c es: ");
+        say(c);
     }
 }

@@ -1,0 +1,22 @@
+habemvs species EjemploObjectivePlox {
+    var open number a;
+
+    funk number dos(number x) {
+      var number y;
+      y = x + 5;
+      reply y;
+    }
+
+    funk oblivion uno(number x) {
+      a = dos(x);
+    }
+
+    funk open oblivion chief() {
+        a = 50;
+
+        uno(15);
+
+        say("El resultado de a es: ");
+        say(a);
+    }
+}
