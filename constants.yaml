@@ -1,7 +1,10 @@
 ---
 190000: false
 190001: true
-150000: 20
-170000: 'Axel: Tengo una novia bonita.'
+150000: 0
 150001: 1
-150002: 200
+170000: 'Fibonacci iterativo:'
+150002: 2
+170001: Ingresa un numero
+170002: 'Fibonacci recursivo:'
+170003: OP
