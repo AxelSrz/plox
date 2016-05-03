@@ -1,0 +1,17 @@
+habemvs species EjemploObjectivePlox {
+    var open number a, b, c;
+    decimal d;
+
+    funk open oblivion chief() {
+        say("Introduce el valor de a");
+        hear(a);
+
+        say("Introduce el valor de b");
+        hear(b);
+
+        c = a / b;
+
+        say("El resultado de dividir a entre b es: ");
+        say(c);
+    }
+}
