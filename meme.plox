@@ -1,0 +1,15 @@
+habemvs species MemeLinda {
+  funk oblivion chief () {
+    var logic bBonita;
+    var number nAxelAnios;
+    bBonita = true;
+    nAxelAnios = 20;
+    while (bBonita) {
+      say("Axel: Tengo una novia bonita.");
+      nAxelAnios += 1;
+      if (nAxelAnios > 200) {
+        bBonita = false;
+      }
+    }
+  }
+}

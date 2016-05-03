@@ -1,4 +1,4 @@
-habemvs species PruebaFactorial () {
+habemvs species PruebaFactorial {
   funk number factorial(number n) {
     if(n == 0) {
       reply 1;
@@ -14,7 +14,7 @@ habemvs species PruebaFactorial () {
 
     j = factorial(i);
 
-    say(i);
+    say(j);
 
   }
 }

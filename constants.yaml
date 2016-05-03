@@ -1,8 +1,7 @@
 ---
 190000: false
 190001: true
-150000: 5
+150000: 20
+170000: 'Axel: Tengo una novia bonita.'
 150001: 1
-150002: 10
-170000: Ingresa el siguiente numero del arreglo
-170001: "¿Que numero quieres buscar?"
+150002: 200
