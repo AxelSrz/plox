@@ -1,10 +1,19 @@
 ---
 190000: false
 190001: true
-150000: 0
-150001: 1
-170000: 'Fibonacci iterativo:'
-150002: 2
-170001: Ingresa un numero
-170002: 'Fibonacci recursivo:'
-170003: OP
+150000: 1
+150001: 10
+150002: 3
+170000: Ingresa el siguiente numero del arreglo a ordenar
+170001: 'Arreglo ordenado:'
+150003: 2
+150004: 4
+150005: 5
+150006: 6
+150007: 7
+150008: 8
+150009: 9
+170002: Ingresa el siguiente numero de la primera matriz a multiplicar
+170003: Ingresa el siguiente numero de la segunda matriz a multiplicar
+150010: 0
+170004: Matriz resultado

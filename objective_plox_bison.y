@@ -611,22 +611,14 @@ end
 
 ---- inner
 
-  # Función que lee un archivo de texto como entrada. Esta ha sido
-  # importada de la gema RACC.
   def parse(input)
     scan_file(input)
   end
 
-  # Metodo que despliega la linea donde encontro el error
   def on_error(t, val, vstack)
     raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val[0].inspect, token_to_str(t) || '?', $line_number)
   end
 
-  # Método que crea una nueva clase en el hash correspondiente.
-  # Parámetros de entrada:
-  # species: el nombre de la clase
-  # Este método crea la estructura del hash y lo agrega
-  # al dirProc. Se muestra un error si la clase ya existe.
   def newSpecies(species)
     if $speciesBook[species] == nil
       $speciesBook[species] = Hash.new
@@ -641,12 +633,6 @@ end
     end
   end
 
-  # Método que implementa la herencia entre clases.
-  # Parámetros de entrada:
-  # father: El nombre de la clase padre
-  # Este método agrega el padre de una clase a la que se encuentra
-  # se hereda y muestra un mensaje de error si la clase padre
-  # no se ha creado.
   def heirSpecies(father)
     if $speciesBook[father] != nil
       $speciesBook[$actualSpecies]["father"] = $speciesBook[father]
@@ -656,15 +642,6 @@ end
     end
   end
 
-  # Método que añade una variable a la tabla de variables para una determinada
-  # clase.
-  # Parámetros de entrada:
-  # Id: El nombre de la variable
-  # Este método crea una nueva variable y se añade
-  # a la tabla de variables. Tiene múltiples validaciones
-  # en caso de que la clase de la variable que estas creando no existe,
-  # o un error si no se define la variable,
-  # O si se ha definido previamente.
   def newVariable(id)
     if $actualMethod == "species"
       unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
@@ -700,9 +677,6 @@ end
     $actualVarId = id
   end
 
-  # Método que crea una nueva matriz. Se recupera la species y el
-  # tipo de la matriz. Se lleva a cabo una validación para ver si está
-  # tratando de crear una matriz de objetos (que no es compatible).
   def newArray()
     if $actualMethod == "species"
       if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
@@ -719,12 +693,6 @@ end
     end
   end
 
-  # Método que agrega una nueva dimension en la declaracion de una matriz.
-  # Parámetros de entrada:
-  # infLi: Limite inferior
-  # supLi: Limite superior
-  # Crea un hash con los datos de los limites y la r acumulada hasta el momento
-  # y lo agrega a las dimensiones de la variable
   def newDimension(infLi, supLi)
     dimension = Hash.new
     dimension["sl"] = supLi[1]
@@ -739,9 +707,6 @@ end
     end
   end
 
-  # Método que saca la dimension total de un array y la k
-  # Segun la formula vuelve a recorrer toda la lista
-  # de dimesiones para sacar el tamaño total y la k
   def defineArray()
     suma = 0
     if $actualMethod == "species"
@@ -775,12 +740,6 @@ end
     end
   end
 
-  # Método recursivo que regresa si un id está declarado en una
-  # species o en alguno de los padres.
-  # Parámetros de entrada:
-  # species: hash de la species a buscar
-  # id: un string del id que se está buscando
-  # type: el tipo del id que se está buscando
   def idDeclaredInSpeciesRecursively(species, id, type)
     if species[type][id] != nil # regresa si la variable ya existe
       return true
@@ -799,15 +758,6 @@ end
     end
   end
 
-  # Método para dar de alta una funcion o método
-  # en una species.
-  # Parámetros de entrada:
-  # id: nombre de la funcion
-  # Este método crea una nueva funcion y se añade
-  # a la tabla de variables. Tiene múltiples validaciones
-  # en caso de que la clase de la funcion que estas creando no existe,
-  # o un error si no se define el tipo de la funcion,
-  # O si la funcion ya se ha definido previamente.
   def newMethod(id)
     unless $speciesBook[$actualSpecies]["methods"][id] != nil
       unless isValidType($actualType) || $actualType == "oblivion"
@@ -827,12 +777,6 @@ end
     end
   end
 
-  # Método que agrega una nuevo argumento a la funcion actual.
-  # Parámetros de entrada:
-  # type: tipo de la funcion
-  # id: el id del argumento
-  # Da de alta el argumento en la tabla de variables de la funcion
-  # e incrementa el contador de parametros
   def newArgument(type, id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] == nil
       unless isValidType(type)
@@ -852,8 +796,6 @@ end
     end
   end
 
-  # Método que checa los tipos de 2 operandos
-  # con el cubo semantico.
   def expressionResultType(operator, leftOp, rightOp)
     if $semanticCube[leftOp][rightOp][operator] == nil
       abort("Semantic error: type mismatch. Cannot combine type '#{leftOp}' and type '#{rightOp}' with operator '#{operator}'. Error on line: #{$line_number}")
@@ -861,8 +803,6 @@ end
     return $semanticCube[leftOp][rightOp][operator]
   end
 
-  # Método que da de alta una constante en la
-  # tabla de constantes
   def newConstant(type, value)
     if $constantBook[value] == nil
       $constantBook[value] = locationGenerator(1, "constant", type)
@@ -870,9 +810,6 @@ end
     return $constantBook[value]
   end
 
-
-  # Método que genera direcciones de memoria segun
-  # el scope, el tipo y el tamaño de la variable
   def locationGenerator(size, scope, type)
     if $theMagicNumber - $magicCounter[scope][type] >= size
       location = $magicReference[scope][type] * $theMagicNumber + $magicCounter[scope][type]
@@ -920,8 +857,6 @@ end
     return result
   end
 
-  # Metódo que regresa la ubicación de una variable en memoria
-  # segun su id
   def retrieveIdLocation(id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
       return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["location"]
@@ -932,8 +867,6 @@ end
     end
   end
 
-  # Metódo que regresa el tipo de una variable
-  # segun su id
   def retrieveIdType(id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
       return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["type"]
@@ -944,8 +877,6 @@ end
     end
   end
 
-  # Metódo que regresa el hash con todas las dimensiones
-  # de una varible segun su id
   def retrieveIdDimensions(id)
     if $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id] != nil
       return $speciesBook[$actualSpecies]["methods"][$actualMethod]["variables"][id]["dimensions"]
@@ -1014,8 +945,6 @@ end
     end
   end
 
-  # Método que se encarga de validar que una funcion haya sido
-  # llamada correctamente
   def validateFunk()
     if $argumentCount != 0
       $argumentCountStack.push($argumentCount)
@@ -1106,8 +1035,6 @@ end
     end
   end
 
-  # Método que se encarga de mandar todos los atributos
-  # de la clase correspondiente al iniciar la llamada a una funcion
   def sendAttributes()
     $speciesBook[$actualSpecies]["variables"].each do |key, h|
       tokens = key.split(".")
@@ -1203,9 +1130,6 @@ end
     end
   end
 
-  # Método que valida que genera los cuadruplos necesarios
-  # para validar el rango de una llamada a un arreglo
-  # y las operaciones necesarias del indexamiento
   def newDimensionIndex(index)
     abort("Semantic error: you can only use numbers to refer a dimension index. Error on line: #{$line_number}") unless index[0] == "number"
     $arrayIndexStack.last["index"] += 1

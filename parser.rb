@@ -7,10 +7,10 @@
 require 'racc/parser.rb'
 
 
-  require_relative 'lexer'  # Se agrega el lexer al programa de racc.
+  require_relative 'lexer'  # Add the lexer to the racc program.
   require 'yaml'
   require "awesome_print"
-  $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
+  $line_number = 0          # Initialization of the variable that stores the line number.
   $speciesBook = Hash.new{}
   $actualSpecies
   $actualModifier
@@ -336,13 +336,10 @@ class ObjectivePlox < Racc::Parser
 
 module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bison.y', 613)
 
-  # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
-  # Funcion que lee un archivo como entrada.
   def parse(input)
     scan_file(input)
   end
 
-  # para poder desplegar la linea en la que se encuentra el error.
   def on_error(t, val, vstack)
     raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val[0].inspect, token_to_str(t) || '?', $line_number)
   end
@@ -525,7 +522,6 @@ module_eval(<<'...end objective_plox_bison.y/module_eval...', 'objective_plox_bi
   end
 
   def expressionResultType(operator, leftOp, rightOp)
-    # puts "Cube call with leftOp: #{leftOp}, rightOp: #{rightOp} and operator: #{operator} on line: #{$line_number}"
     if $semanticCube[leftOp][rightOp][operator] == nil
       abort("Semantic error: type mismatch. Cannot combine type '#{leftOp}' and type '#{rightOp}' with operator '#{operator}'. Error on line: #{$line_number}")
     end
