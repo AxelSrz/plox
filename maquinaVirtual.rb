@@ -41,7 +41,7 @@ class VirtualMachine
   # It pushes the context and increases the context
   # pointer size in case a new context arrives later.
   # This method is called after initialize() and it helps
-  # keep track of the memory used during execution. 
+  # keep track of the memory used during execution.
   def initialContext()
     context = Hash.new
     @constantBook.each do |key, value|

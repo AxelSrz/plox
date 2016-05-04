@@ -1,22 +1,18 @@
-@@ -2,43 +2,608 @@
+---
 - - goto
-  -
-  -
-  - 1
+  - 
+  - 
   - 138
 - - "="
-  -
-  - 190001
-  - 90000
+  - 
   - 150000
   - 50001
 - - "="
-  -
-  - 150000
+  - 
   - 150001
   - 50002
 - - "="
-  -
+  - 
   - 150001
   - 50004
 - - "<"
@@ -24,72 +20,60 @@
   - 50000
   - 140000
 - - gotoF
-  - 90000
   - 140000
-  -
-  - 10
-- - say
-  - 170000
+  - 
   - 12
 - - "+"
   - 50001
   - 50002
   - 100000
 - - "="
-  -
+  - 
   - 100000
   - 50003
 - - "="
-  -
+  - 
   - 50002
   - 50001
 - - "="
-  -
+  - 
   - 50003
   - 50002
 - - "+="
-  -
+  - 
   - 150001
-  - 50000
-- - ">"
   - 50004
 - - goto
-  -
-  -
+  - 
+  - 
   - 4
 - - say
   - 170000
-  -
-  -
+  - 
+  - 
 - - return
-  -
-  -
+  - 
+  - 
   - 50002
 - - return
-  -
-  -
-  -
+  - 
+  - 
+  - 
 - - "<"
   - 50000
   - 150002
-  - 140000
   - 140001
 - - gotoF
-  - 140000
   - 140001
-  -
+  - 
   - 19
 - - return
-  -
-  - 9
-- - "="
-  -
-  - 190000
-  - 90000
+  - 
+  - 
   - 50000
 - - goto
-  -
-  -
+  - 
+  - 
   - 137
 - - "-"
   - 50000
@@ -102,227 +86,227 @@
   - 50000
 - - SEND_ATTR
   - 0
-  -
+  - 
   - 0
 - - SEND_ATTR
   - 1
-  -
+  - 
   - 1
 - - SEND_ATTR
   - 2
-  -
+  - 
   - 2
 - - SEND_ATTR
   - 3
-  -
+  - 
   - 3
 - - SEND_ATTR
   - 4
-  -
+  - 
   - 4
 - - SEND_ATTR
   - 5
-  -
+  - 
   - 5
 - - SEND_ATTR
   - 6
-  -
+  - 
   - 6
 - - SEND_ATTR
   - 7
-  -
+  - 
   - 7
 - - SEND_ATTR
   - 8
-  -
+  - 
   - 8
 - - SEND_ATTR
   - 9
-  -
+  - 
   - 9
 - - SEND_ATTR
   - 10
-  -
+  - 
   - 10
 - - SEND_ATTR
   - 11
-  -
+  - 
   - 11
 - - SEND_ATTR
   - 12
-  -
+  - 
   - 12
 - - SEND_ATTR
   - 13
-  -
+  - 
   - 13
 - - SEND_ATTR
   - 14
-  -
+  - 
   - 14
 - - SEND_ATTR
   - 15
-  -
+  - 
   - 15
 - - SEND_ATTR
   - 16
-  -
+  - 
   - 16
 - - SEND_ATTR
   - 17
-  -
+  - 
   - 17
 - - SEND_ATTR
   - 18
-  -
+  - 
   - 18
 - - SEND_ATTR
   - 19
-  -
+  - 
   - 19
 - - SEND_ATTR
   - 20
-  -
+  - 
   - 20
 - - SEND_ATTR
   - 21
-  -
+  - 
   - 21
 - - SEND_ATTR
   - 22
-  -
+  - 
   - 22
 - - SEND_ATTR
   - 23
-  -
+  - 
   - 23
 - - SEND_ATTR
   - 24
-  -
+  - 
   - 24
 - - SEND_ATTR
   - 25
-  -
+  - 
   - 25
 - - SEND_ATTR
   - 26
-  -
+  - 
   - 26
 - - SEND_ATTR
   - 27
-  -
+  - 
   - 27
 - - SEND_ATTR
   - 28
-  -
+  - 
   - 28
 - - SEND_ATTR
   - 29
-  -
+  - 
   - 29
 - - SEND_ATTR
   - 30
-  -
+  - 
   - 30
 - - SEND_ATTR
   - 31
-  -
+  - 
   - 31
 - - SEND_ATTR
   - 32
-  -
+  - 
   - 32
 - - SEND_ATTR
   - 33
-  -
+  - 
   - 33
 - - SEND_ATTR
   - 34
-  -
+  - 
   - 34
 - - SEND_ATTR
   - 35
-  -
+  - 
   - 35
 - - SEND_ATTR
   - 36
-  -
+  - 
   - 36
 - - SEND_ATTR
   - 37
-  -
+  - 
   - 37
 - - SEND_ATTR
   - 38
-  -
+  - 
   - 38
 - - SEND_ATTR
   - 39
-  -
+  - 
   - 39
 - - SEND_ATTR
   - 40
-  -
+  - 
   - 40
 - - SEND_ATTR
   - 41
-  -
+  - 
   - 41
 - - SEND_ATTR
   - 42
-  -
+  - 
   - 42
 - - SEND_ATTR
   - 43
-  -
+  - 
   - 43
 - - SEND_ATTR
   - 44
-  -
+  - 
   - 44
 - - SEND_ATTR
   - 45
-  -
+  - 
   - 45
 - - SEND_ATTR
   - 46
-  -
+  - 
   - 46
 - - SEND_ATTR
   - 47
-  -
+  - 
   - 47
 - - SEND_ATTR
   - 48
-  -
+  - 
   - 48
 - - SEND_ATTR
   - 49
-  -
+  - 
   - 49
 - - SEND_ATTR
   - 50
-  -
+  - 
   - 50
 - - SEND_ATTR
   - 51
-  -
+  - 
   - 51
 - - SEND_ATTR
   - 52
-  -
+  - 
   - 52
 - - SEND_ATTR
   - 53
-  -
+  - 
   - 53
 - - SEND_ATTR
   - 54
-  -
+  - 
   - 54
 - - gosub
   - 15
-  -
+  - 
   - 50001
 - - "-"
   - 50000
@@ -335,247 +319,247 @@
   - 50000
 - - SEND_ATTR
   - 0
-  -
+  - 
   - 0
 - - SEND_ATTR
   - 1
-  -
+  - 
   - 1
 - - SEND_ATTR
   - 2
-  -
+  - 
   - 2
 - - SEND_ATTR
   - 3
-  -
+  - 
   - 3
 - - SEND_ATTR
   - 4
-  -
+  - 
   - 4
 - - SEND_ATTR
   - 5
-  -
+  - 
   - 5
 - - SEND_ATTR
   - 6
-  -
+  - 
   - 6
 - - SEND_ATTR
   - 7
-  -
+  - 
   - 7
 - - SEND_ATTR
   - 8
-  -
+  - 
   - 8
 - - SEND_ATTR
   - 9
-  -
+  - 
   - 9
 - - SEND_ATTR
   - 10
-  -
+  - 
   - 10
 - - SEND_ATTR
   - 11
-  -
+  - 
   - 11
 - - SEND_ATTR
   - 12
-  -
+  - 
   - 12
 - - SEND_ATTR
   - 13
-  -
+  - 
   - 13
 - - SEND_ATTR
   - 14
-  -
+  - 
   - 14
 - - SEND_ATTR
   - 15
-  -
+  - 
   - 15
 - - SEND_ATTR
   - 16
-  -
+  - 
   - 16
 - - SEND_ATTR
   - 17
-  -
+  - 
   - 17
 - - SEND_ATTR
   - 18
-  -
+  - 
   - 18
 - - SEND_ATTR
   - 19
-  -
+  - 
   - 19
 - - SEND_ATTR
   - 20
-  -
+  - 
   - 20
 - - SEND_ATTR
   - 21
-  -
+  - 
   - 21
 - - SEND_ATTR
   - 22
-  -
+  - 
   - 22
 - - SEND_ATTR
   - 23
-  -
+  - 
   - 23
 - - SEND_ATTR
   - 24
-  -
+  - 
   - 24
 - - SEND_ATTR
   - 25
-  -
+  - 
   - 25
 - - SEND_ATTR
   - 26
-  -
+  - 
   - 26
 - - SEND_ATTR
   - 27
-  -
+  - 
   - 27
 - - SEND_ATTR
   - 28
-  -
+  - 
   - 28
 - - SEND_ATTR
   - 29
-  -
+  - 
   - 29
 - - SEND_ATTR
   - 30
-  -
+  - 
   - 30
 - - SEND_ATTR
   - 31
-  -
+  - 
   - 31
 - - SEND_ATTR
   - 32
-  -
+  - 
   - 32
 - - SEND_ATTR
   - 33
-  -
+  - 
   - 33
 - - SEND_ATTR
   - 34
-  -
+  - 
   - 34
 - - SEND_ATTR
   - 35
-  -
+  - 
   - 35
 - - SEND_ATTR
   - 36
-  -
+  - 
   - 36
 - - SEND_ATTR
   - 37
-  -
+  - 
   - 37
 - - SEND_ATTR
   - 38
-  -
+  - 
   - 38
 - - SEND_ATTR
   - 39
-  -
+  - 
   - 39
 - - SEND_ATTR
   - 40
-  -
+  - 
   - 40
 - - SEND_ATTR
   - 41
-  -
+  - 
   - 41
 - - SEND_ATTR
   - 42
-  -
+  - 
   - 42
 - - SEND_ATTR
   - 43
-  -
+  - 
   - 43
 - - SEND_ATTR
   - 44
-  -
+  - 
   - 44
 - - SEND_ATTR
   - 45
-  -
+  - 
   - 45
 - - SEND_ATTR
   - 46
-  -
+  - 
   - 46
 - - SEND_ATTR
   - 47
-  -
+  - 
   - 47
 - - SEND_ATTR
   - 48
-  -
+  - 
   - 48
 - - SEND_ATTR
   - 49
-  -
+  - 
   - 49
 - - SEND_ATTR
   - 50
-  -
+  - 
   - 50
 - - SEND_ATTR
   - 51
-  -
+  - 
   - 51
 - - SEND_ATTR
   - 52
-  -
+  - 
   - 52
 - - SEND_ATTR
   - 53
-  -
+  - 
   - 53
 - - SEND_ATTR
   - 54
-  -
+  - 
   - 54
 - - gosub
   - 15
-  -
+  - 
   - 50002
 - - "+"
   - 50001
   - 50002
   - 100003
 - - return
-  -
-  -
+  - 
+  - 
   - 100003
 - - return
-  -
-  -
-  -
+  - 
+  - 
+  - 
 - - say
   - 170001
-  -
-  -
+  - 
+  - 
 - - hear
   - number
-  -
+  - 
   - 50000
 - - param
   - 50000
@@ -584,7 +568,7 @@
   - 50000
 - - gosub
   - 1
-  -
+  - 
   - 50001
 - - param
   - 50001
@@ -593,16 +577,16 @@
   - 50000
 - - gosub
   - 1
-  -
+  - 
   - 50002
 - - say
   - 50002
-  -
-  -
+  - 
+  - 
 - - say
   - 170002
-  -
-  -
+  - 
+  - 
 - - param
   - 50000
   - - 1
@@ -610,16 +594,17 @@
   - 50000
 - - gosub
   - 15
-  -
+  - 
   - 50003
 - - say
   - 50003
-  -
-  -
+  - 
+  - 
 - - say
   - 170003
-  -
-  -
+  - 
+  - 
 - - terminate
-  -
-  -
+  - 
+  - 
+  - 
