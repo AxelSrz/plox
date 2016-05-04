@@ -284,10 +284,10 @@ end
 
 ---- header
 
-  require_relative 'lexer'  # Se agrega el lexer al programa de racc.
+  require_relative 'lexer'  # Add the lexer to the racc program.
   require 'yaml'
   require "awesome_print"
-  $line_number = 0          # Se inicializa la variable que guarda el numero de linea en la cual se encuentra el error.
+  $line_number = 0          # Initialization of the variable that stores the line number.
   $speciesBook = Hash.new{}
   $actualSpecies
   $actualModifier
@@ -611,17 +611,22 @@ end
 
 ---- inner
 
-  # Se importa esta funcion perteneciente a la gema de racc. Se realiza una modificacion
-  # Funcion que lee un archivo como entrada.
+  # Function that reads a text file as an input. This has been
+  # imported from the racc gem.
   def parse(input)
     scan_file(input)
   end
 
-  # para poder desplegar la linea en la que se encuentra el error.
+  # Method that displays the line on which a parsing error occured.
   def on_error(t, val, vstack)
     raise ParseError, sprintf("\nParsing error on value %s (%s) found on line: %i", val[0].inspect, token_to_str(t) || '?', $line_number)
   end
 
+  # Method that creates a new class in the corresponding hash.
+  # Entry parameters:
+  # species - the name of the class
+  # This method creates the structure of the hash and it is added
+  # to the dirProc. It displays an error if the class exists already.
   def newSpecies(species)
     if $speciesBook[species] == nil
       $speciesBook[species] = Hash.new
@@ -636,6 +641,12 @@ end
     end
   end
 
+  # Method that implements inheritance between classes.
+  # Entry parameters:
+  # father - The name of the father class
+  # This method adds the father of a class to the one that is
+  # inheriting and displays an error message if the father class
+  # has not been created.
   def heirSpecies(father)
     if $speciesBook[father] != nil
       $speciesBook[$actualSpecies]["father"] = $speciesBook[father]
@@ -645,6 +656,15 @@ end
     end
   end
 
+  # Method that adds a variable to the variable table for a given
+  # class.
+  # Entry parameters: id
+  # id - The name of the variable
+  # This method creates a new variable and it adds
+  # the variable to the table of variables. It has multiple validations
+  # in case the class to which you are creating the variable for doesn't exist,
+  # error if the class is recursive, or an error if the variable is not defined
+  # or if it has been defined previously.
   def newVariable(id)
     if $actualMethod == "species"
       unless idDeclaredInSpeciesRecursively($speciesBook[$actualSpecies], id, "variables")
@@ -680,6 +700,9 @@ end
     $actualVarId = id
   end
 
+  # Method that creates a new array. It retrieves the species and the
+  # type of the array. It performs a validation check to see if you are
+  # trying to create an object array (which is not supported).
   def newArray()
     if $actualMethod == "species"
       if $actualType == "number" || $actualType == "decimal" || $actualType == "string" || $actualType == "char" || $actualType == "logic"
