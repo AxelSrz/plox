@@ -3,9 +3,8 @@ require './parser.rb'
 require 'yaml'
 require "awesome_print"
 
-# Class that simulates the memory and stores
-# parameters and attributes as well as the
-# current context. 
+# Class that simulates the memory call stack and stores
+# parameters and attributes and has a context identifier
 class Memory
   attr_accessor :params, :attributes, :context
   def initialize()
@@ -20,8 +19,12 @@ end
 # for execution. AKA Virtual Machine
 class VirtualMachine
 
+  # The following methods, initialize and initialContext are
+  # the ones that simulate the actual memory.
+
   # Method that initializes all the variables for the
-  # virtual machine class.
+  # virtual machine class and especially the memory where
+  # directions and values are going to be stored.
   def initialize()
     # Variable that saves the number of the current Quadruple
     @quadruplePointer = 0
@@ -37,6 +40,8 @@ class VirtualMachine
   # Method that defines the initial context.
   # It pushes the context and increases the context
   # pointer size in case a new context arrives later.
+  # This method is called after initialize() and it helps
+  # keep track of the memory used during execution. 
   def initialContext()
     context = Hash.new
     @constantBook.each do |key, value|
